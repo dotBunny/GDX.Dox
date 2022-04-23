@@ -14,7 +14,7 @@ public class Changelog : StepBase
 
     static string GetPath()
     {
-        return Path.Combine(GenerateCommand.InputDirectory, ".docfx", "changelog.md");
+        return Path.Combine(Program.InputDirectory, ".docfx", "changelog.md");
     }
 
     public override void Clean()
@@ -43,7 +43,7 @@ public class Changelog : StepBase
     public override void Execute()
     {
         string path = GetPath();
-        string contentPath = Path.Combine(GenerateCommand.InputDirectory, "CHANGELOG.md");
+        string contentPath = Path.Combine(Program.InputDirectory, "CHANGELOG.md");
         if (!File.Exists(contentPath))
         {
             Output.Error("Unable to find actual Changelog.", -1, true);

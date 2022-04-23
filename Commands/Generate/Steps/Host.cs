@@ -36,7 +36,7 @@ public class Host : StepBase
             return;
         }
 
-        string docfxJsonPath = Path.Combine(GenerateCommand.InputDirectory, ".docfx", "docfx.json");
+        string docfxJsonPath = Path.Combine(Program.InputDirectory, ".docfx", "docfx.json");
         if (!File.Exists(docfxJsonPath))
         {
             Output.Error($"Unable to find required docfx.json at {docfxJsonPath}.", -1, true);
@@ -52,7 +52,8 @@ public class Host : StepBase
             Output.Error("An error occured while building the documentation.", -1, true);
         }
 
-        Console.WriteLine($"\nDocumentation should become available at:\n\nhttp://localhost:8080/\n\nYou will need to CTRL+Click that link, or navigate there in a browser.\nClosing the spawned window (PID:{execute}) will stop the hosting.");
+        Console.WriteLine(
+            $"\nDocumentation should become available at:\n\nhttp://localhost:8080/\n\nYou will need to CTRL+Click that link, or navigate there in a browser.\nClosing the spawned window (PID:{execute}) will stop the hosting.");
 
         GenerateCommand.IsHosting = true;
     }

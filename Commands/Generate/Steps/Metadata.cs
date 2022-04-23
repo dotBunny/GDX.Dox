@@ -28,7 +28,7 @@ public class Metadata : StepBase
     /// <inheritdoc />
     public override void Execute()
     {
-        string docfxJsonPath = Path.Combine(GenerateCommand.InputDirectory, ".docfx", "docfx.json");
+        string docfxJsonPath = Path.Combine(Program.InputDirectory, ".docfx", "docfx.json");
         if (!File.Exists(docfxJsonPath))
         {
             Output.Error($"Unable to find required docfx.json at {docfxJsonPath}.", -1, true);

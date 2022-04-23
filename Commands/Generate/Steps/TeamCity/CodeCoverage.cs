@@ -14,7 +14,7 @@ public class CodeCoverage : StepBase
 
     static string GetPath()
     {
-        return Path.Combine(GenerateCommand.InputDirectory, ".docfx", "reports", "coverage");
+        return Path.Combine(Program.InputDirectory, ".docfx", "reports", "coverage");
     }
 
     /// <inheritdoc />

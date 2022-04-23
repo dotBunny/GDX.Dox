@@ -13,7 +13,6 @@ public class Build : StepBase
 {
     public const string Key = "build";
     public const string OutputKey = "output";
-    public static string OutputDirectory = GetDefaultOutputFolder();
 
     public Build()
     {
@@ -22,18 +21,18 @@ public class Build : StepBase
     }
 
 
-    public static string GetDefaultOutputFolder()
+    public static string GetOutputFolder()
     {
-        return Path.Combine(GenerateCommand.InputDirectory, ".docfx", "_site");
+        return Path.Combine(Program.InputDirectory, ".docfx", "_site");
     }
 
     /// <inheritdoc />
     public override void Clean()
     {
-        if (Directory.Exists(OutputDirectory))
+        if (Directory.Exists(GetOutputFolder()))
         {
             Output.LogLine("Deleting previous output folder ...");
-            Directory.Delete(OutputDirectory, true);
+            Directory.Delete(GetOutputFolder(), true);
         }
     }
 
@@ -52,21 +51,8 @@ public class Build : StepBase
     /// <inheritdoc />
     public override void Execute()
     {
-        // Process arguments
-        Program.GetParameter(OutputKey, GetDefaultOutputFolder(), out OutputDirectory,
-            s =>
-            {
-                if (Path.IsPathFullyQualified(s))
-                {
-                    return s;
-                }
-
-                return Path.GetFullPath(Path.Combine(Program.ProcessDirectory, s));
-            });
-        Output.Value("Build.OutputDirectory", OutputDirectory);
-
         // Check for DocFX json
-        string docfxJsonPath = Path.Combine(GenerateCommand.InputDirectory, ".docfx", "docfx.json");
+        string docfxJsonPath = Path.Combine(Program.InputDirectory, ".docfx", "docfx.json");
         if (!File.Exists(docfxJsonPath))
         {
             Output.Error($"Unable to find required docfx.json at {docfxJsonPath}.", -1, true);
@@ -81,18 +67,6 @@ public class Build : StepBase
         if (!execute)
         {
             Output.Error("An error occured while building the documentation.", -1, true);
-        }
-
-        // We need to move this somewhere
-        if (OutputDirectory != GetDefaultOutputFolder())
-        {
-            if (!Directory.Exists(OutputDirectory))
-            {
-                Directory.CreateDirectory(OutputDirectory);
-            }
-
-            Output.LogLine($"Copying output to destination {OutputDirectory}.");
-            Platform.CopyFilesRecursively(GetDefaultOutputFolder(), OutputDirectory);
         }
     }
 }

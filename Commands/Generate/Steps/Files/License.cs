@@ -14,7 +14,7 @@ public class License : StepBase
 
     static string GetPath()
     {
-        return Path.Combine(GenerateCommand.InputDirectory, ".docfx", "license.md");
+        return Path.Combine(Program.InputDirectory, ".docfx", "license.md");
     }
 
     public override void Clean()
@@ -43,7 +43,7 @@ public class License : StepBase
     public override void Execute()
     {
         string path = GetPath();
-        string contentPath = Path.Combine(GenerateCommand.InputDirectory, "LICENSE");
+        string contentPath = Path.Combine(Program.InputDirectory, "LICENSE");
         if (!File.Exists(contentPath))
         {
             Output.Error("Unable to find actual License.", -1, true);

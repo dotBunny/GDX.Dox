@@ -14,7 +14,7 @@ public class CodeOfConduct : StepBase
 
     static string GetPath()
     {
-        return Path.Combine(GenerateCommand.InputDirectory, ".docfx", "manual", "contributing", "code-of-conduct.md");
+        return Path.Combine(Program.InputDirectory, ".docfx", "manual", "contributing", "code-of-conduct.md");
     }
 
     public override void Clean()
@@ -43,7 +43,7 @@ public class CodeOfConduct : StepBase
     public override void Execute()
     {
         string path = GetPath();
-        string contentPath = Path.Combine(GenerateCommand.InputDirectory, "CODE_OF_CONDUCT.md");
+        string contentPath = Path.Combine(Program.InputDirectory, "CODE_OF_CONDUCT.md");
         if (!File.Exists(contentPath))
         {
             Output.Error("Unable to find actual Code of Conduct.", -1, true);

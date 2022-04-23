@@ -15,7 +15,7 @@ public class Duplicates : StepBase
 
     static string GetPath()
     {
-        return Path.Combine(GenerateCommand.InputDirectory, ".docfx", "reports", "duplicates");
+        return Path.Combine(Program.InputDirectory, ".docfx", "reports", "duplicates");
     }
 
     /// <inheritdoc />

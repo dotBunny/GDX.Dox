@@ -4,9 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using Dox.Commands.Generate.Steps;
-using Dox.Commands.Generate.Steps.Reports;
 using Dox.Utils;
 
 namespace Dox.Commands.Generate;
@@ -15,10 +12,6 @@ public static class GenerateCommand
 {
     public const string Argument = "generate";
     public const string StepsKey = "steps";
-
-    public const string InputKey = "input";
-
-    public static string InputDirectory = Path.Combine(Program.ProcessDirectory, "..", "..", "..", "..", "Projects", "GDX_Development", "Packages", "com.dotbunny.gdx");
 
 
 
@@ -32,24 +25,6 @@ public static class GenerateCommand
     public static void Process()
     {
         Output.LogLine("Generating ...");
-
-        // Validate provided input directory
-        bool validInput = Program.GetParameter(InputKey, InputDirectory, out InputDirectory,
-            s =>
-            {
-                if (Path.IsPathFullyQualified(s))
-                {
-                    return s;
-                }
-
-                return Path.GetFullPath(Path.Combine(Program.ProcessDirectory, s));
-            },
-            Directory.Exists);
-        if (!validInput)
-        {
-            Output.Error($"Unable to find input folder ({InputDirectory}\nPlease provide a valid absolute path.", -1, true);
-        }
-        Output.Value("GenerateCommand.InputDirectory", InputDirectory);
 
         //TODO: Should we validate the path
 
@@ -84,7 +59,6 @@ public static class GenerateCommand
 
     public static void RegisterHelp()
     {
-        Program.Args.RegisterHelp("Generate", $"{InputKey} <value>",
-            $"\t\t\tThe relative or absolute path to the GDX package.\n\t\t\t\t[default] {InputDirectory}", true);
+
     }
 }

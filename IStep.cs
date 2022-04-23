@@ -5,7 +5,7 @@
 namespace Dox;
 
 /// <summary>
-/// Step Interface
+///     Step Interface
 /// </summary>
 public interface IStep
 {

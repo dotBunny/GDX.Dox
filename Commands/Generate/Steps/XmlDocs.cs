@@ -14,11 +14,11 @@ namespace Dox.Commands.Generate.Steps;
 public class XmlDocs : StepBase
 {
     public const string DefinesKey = "defines";
-    public static string Defines = "GDX_LICENSED;GDX_ADDRESSABLES;GDX_PLATFORMS;GDX_VISUALSCRIPTING";
 
     //TODO: these update the xml in teh main repo? should that be pushed if changes?
 
     public const string Key = "msbuild";
+    public static string Defines = "GDX_LICENSED;GDX_ADDRESSABLES;GDX_PLATFORMS;GDX_VISUALSCRIPTING";
 
     public XmlDocs()
     {
@@ -41,13 +41,13 @@ public class XmlDocs : StepBase
     /// <inheritdoc />
     public override void Execute()
     {
-
         // Defines
         Program.GetParameter(DefinesKey, Defines, out Defines);
         Output.Value("XmlDocs.Defines", Defines);
 
-        string gdxProjectPath = Path.GetFullPath(Path.Combine(GenerateCommand.InputDirectory, "..", "..", "GDX.csproj"));
-        string gdxXmlPath = Path.Combine(GenerateCommand.InputDirectory, ".docfx", "GDX.xml");
+        string gdxProjectPath =
+            Path.GetFullPath(Path.Combine(Program.InputDirectory, "..", "..", "GDX.csproj"));
+        string gdxXmlPath = Path.Combine(Program.InputDirectory, ".docfx", "GDX.xml");
 
         if (!File.Exists(gdxProjectPath))
         {

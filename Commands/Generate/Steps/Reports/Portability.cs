@@ -44,7 +44,7 @@ public class Portability : StepBase
 
     static string GetPath()
     {
-        return Path.Combine(GenerateCommand.InputDirectory, ".docfx", "reports", "portability");
+        return Path.Combine(Program.InputDirectory, ".docfx", "reports", "portability");
     }
 
     string GetJsonPath()
@@ -67,7 +67,8 @@ public class Portability : StepBase
     public override void Execute()
     {
         string gdxLibraryPath =
-            Path.GetFullPath(Path.Combine(GenerateCommand.InputDirectory, "..", "..", "Library", "ScriptAssemblies", "GDX.dll"));
+            Path.GetFullPath(Path.Combine(Program.InputDirectory, "..", "..", "Library", "ScriptAssemblies",
+                "GDX.dll"));
 
         if (!File.Exists(gdxLibraryPath))
         {
@@ -76,7 +77,7 @@ public class Portability : StepBase
         }
 
         string gdxEditorLibraryPath =
-            Path.GetFullPath(Path.Combine(GenerateCommand.InputDirectory, "..", "..", "Library", "ScriptAssemblies",
+            Path.GetFullPath(Path.Combine(Program.InputDirectory, "..", "..", "Library", "ScriptAssemblies",
                 "GDX.Editor.dll"));
 
         if (!File.Exists(gdxLibraryPath))

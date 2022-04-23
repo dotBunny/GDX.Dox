@@ -46,6 +46,12 @@ static class Program
     /// </summary>
     public static Assembly ProgramAssembly;
 
+    public static string InputDirectory = Path.GetFullPath(Path.Combine(ProcessDirectory, "..", "..", "..", "..", "Projects",
+        "GDX_Development", "Packages", "com.dotbunny.gdx"));
+
+
+    public const string InputKey = "input";
+
     /// <summary>
     ///     Execution point of entry.
     /// </summary>
@@ -63,6 +69,7 @@ static class Program
         Output.LogLine("Initializing ...");
 
         bool init = Init.Process(args);
+
         GenerateCommand.RegisterHelp();
         DeployCommand.RegisterHelp();
 
@@ -72,6 +79,26 @@ static class Program
             Args.Help();
             return;
         }
+
+        // Validate provided input directory
+        bool validInput = Program.GetParameter(InputKey, InputDirectory, out InputDirectory,
+            s =>
+            {
+                if (Path.IsPathFullyQualified(s))
+                {
+                    return s;
+                }
+
+                return Path.GetFullPath(Path.Combine(Program.ProcessDirectory, s));
+            },
+            Directory.Exists);
+        if (!validInput)
+        {
+            Output.Error($"Unable to find input folder ({InputDirectory}\nPlease provide a valid absolute path.", -1,
+                true);
+        }
+
+        Output.Value("Program.InputDirectory", InputDirectory);
 
         bool hasCommand = Args.Has(GenerateCommand.Argument) || Args.Has(DeployCommand.Argument);
         if (!hasCommand)
@@ -96,7 +123,6 @@ static class Program
                 DeployCommand.Process();
             }
         }
-
     }
 
     /// <summary>

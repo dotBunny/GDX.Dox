@@ -14,7 +14,8 @@ public class Footer : StepBase
 
     static string GetPath()
     {
-        return Path.Combine(GenerateCommand.InputDirectory, ".docfx", "templates", "gdx", "partials", "footer.tmpl.partial");
+        return Path.Combine(Program.InputDirectory, ".docfx", "templates", "gdx", "partials",
+            "footer.tmpl.partial");
     }
 
     public override void Clean()
@@ -49,7 +50,7 @@ public class Footer : StepBase
             Directory.CreateDirectory(parent);
         }
 
-        string commit = Git.GetHeadCommit(GenerateCommand.InputDirectory);
+        string commit = Git.GetHeadCommit(Program.InputDirectory);
         string shortCommit = commit.Substring(0, 7);
         Output.LogLine($"Using local Git commit hash {shortCommit} / {commit}.");
 

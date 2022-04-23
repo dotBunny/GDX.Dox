@@ -29,7 +29,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DefineConstants />
+    <DefineConstants/>
     <DebugType>portable</DebugType>
     <WarningLevel>3</WarningLevel>
     <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
@@ -39,18 +39,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Packages\docfx-2.59.2.zip" />
+    <None Remove="Packages\docfx-2.59.2.zip"/>
     <Content Include="Packages\docfx-2.59.2.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Remove="Packages\apiport-2.8.10.zip" />
+    <None Remove="Packages\apiport-2.8.10.zip"/>
     <Content Include="Packages\apiport-2.8.10.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
-    <PackageReference Include="YamlDotNet" Version="11.2.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1"/>
+    <PackageReference Include="YamlDotNet" Version="11.2.1"/>
   </ItemGroup>
 </Project>

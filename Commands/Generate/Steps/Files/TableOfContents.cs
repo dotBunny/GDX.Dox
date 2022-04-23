@@ -19,7 +19,7 @@ public class TableOfContents : StepBase
 
     string GetPath()
     {
-        return Path.Combine(GenerateCommand.InputDirectory, ".docfx", "api", "toc.yml");
+        return Path.Combine(Program.InputDirectory, ".docfx", "api", "toc.yml");
     }
 
     /// <inheritdoc />

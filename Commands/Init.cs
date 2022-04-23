@@ -10,11 +10,12 @@ namespace Dox.Commands.Generate;
 
 public static class Init
 {
+    public const string PingHostKey = "ping-host";
+
     /// <summary>
     ///     The defined hostname to use when pinging to determine an outside connection.
     /// </summary>
     public static string PingHost = "github.com";
-    public const string PingHostKey = "ping-host";
 
     public static bool Process(string[] args)
     {
@@ -24,14 +25,14 @@ public static class Init
         Program.Args = new Arguments(args);
 
         // PingHost
-        Program.GetParameter(PingHostKey, "github.com", out Init.PingHost);
-        Output.Value("Init.PingHost", Init.PingHost);
+        Program.GetParameter(PingHostKey, "github.com", out PingHost);
+        Output.Value("Init.PingHost", PingHost);
 
         // Check Internet Connection
         Ping ping = new();
         try
         {
-            PingReply reply = ping.Send(Init.PingHost, 3000);
+            PingReply reply = ping.Send(PingHost, 3000);
             if (reply != null)
             {
                 Program.IsOnline = reply.Status == IPStatus.Success;
@@ -70,6 +71,10 @@ public static class Init
 
             Program.RegisteredSteps.Add(step.GetIdentifier().ToLower(), step);
         }
+
+
+        Program.Args.RegisterHelp("Global", $"{Program.InputKey} <value>",
+            $"\t\t\tThe relative or absolute path to the GDX package.\n\t\t\t\t[default] {Program.InputDirectory}", true);
 
         return true;
     }

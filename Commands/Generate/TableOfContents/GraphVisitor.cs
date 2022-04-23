@@ -18,11 +18,11 @@ public sealed class GraphVisitor : ChainedObjectGraphVisitor
         ObjectSerializer nestedObjectSerializer)
         : base(nextVisitor)
     {
-        this.m_TypeConverters = typeConverters != null
+        m_TypeConverters = typeConverters != null
             ? typeConverters.ToList()
             : Enumerable.Empty<IYamlTypeConverter>();
 
-        this.m_NestedObjectSerializer = nestedObjectSerializer;
+        m_NestedObjectSerializer = nestedObjectSerializer;
     }
 
     public override bool Enter(IObjectDescriptor value, IEmitter context)

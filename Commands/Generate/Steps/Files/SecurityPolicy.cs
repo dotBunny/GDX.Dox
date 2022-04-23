@@ -14,7 +14,7 @@ public class SecurityPolicy : StepBase
 
     static string GetPath()
     {
-        return Path.Combine(GenerateCommand.InputDirectory, ".docfx", "manual", "security.md");
+        return Path.Combine(Program.InputDirectory, ".docfx", "manual", "security.md");
     }
 
     public override void Clean()
@@ -43,7 +43,7 @@ public class SecurityPolicy : StepBase
     public override void Execute()
     {
         string path = GetPath();
-        string contentPath = Path.Combine(GenerateCommand.InputDirectory, "SECURITY.md");
+        string contentPath = Path.Combine(Program.InputDirectory, "SECURITY.md");
         if (!File.Exists(contentPath))
         {
             Output.Error("Unable to find actual Security Policy.", -1, true);

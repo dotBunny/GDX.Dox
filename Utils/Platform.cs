@@ -24,6 +24,19 @@ public static class Platform
         return RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
     }
 
+    public static void NormalizeFolder(DirectoryInfo directory)
+    {
+        foreach (DirectoryInfo subDir in directory.GetDirectories())
+        {
+            NormalizeFolder(subDir);
+        }
+
+        foreach (FileInfo file in directory.GetFiles())
+        {
+            file.Attributes = FileAttributes.Normal;
+        }
+    }
+
     public static void CopyFilesRecursively(string sourcePath, string targetPath)
     {
         //Now Create all of the directories

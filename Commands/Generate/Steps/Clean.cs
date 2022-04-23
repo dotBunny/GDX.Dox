@@ -28,7 +28,7 @@ public class Clean : StepBase
     /// <inheritdoc />
     public override void Execute()
     {
-        string objFolder = Path.Combine(GenerateCommand.InputDirectory, ".docfx", "obj");
+        string objFolder = Path.Combine(Program.InputDirectory, ".docfx", "obj");
         if (Directory.Exists(objFolder))
         {
             Output.LogLine("Deleting previous intermediate folder ...");

@@ -12,18 +12,27 @@ public static class Git
     public static string GetHeadCommit(string repositoryDirectory)
     {
         TextGenerator generator = new();
-        if (Platform.IsWindows())
-        {
-            ChildProcess.WaitFor("git.exe", repositoryDirectory, "rev-parse HEAD",
-                s => { generator.AppendLine(s); });
-        }
-        else
-        {
-            ChildProcess.WaitFor("git", repositoryDirectory, "rev-parse HEAD",
-                s => { generator.AppendLine(s); });
-        }
-
+        ChildProcess.WaitFor(Platform.IsWindows() ? "git.exe" : "git", repositoryDirectory,
+            "rev-parse HEAD",
+            s => { generator.AppendLine(s); });
         return generator.ToString();
+    }
+
+    public static void Commit(string repositoryDirectory, string message)
+    {
+        string command = "git.exe";
+        if (!Platform.IsWindows())
+        {
+            command = "git";
+        }
+        ChildProcess.WaitFor(command, repositoryDirectory, "add --all");
+        ChildProcess.WaitFor(command, repositoryDirectory, $"commit -m \"{message}\"");
+    }
+
+    public static void Checkout(string repositoryDirectory, string branch)
+    {
+        ChildProcess.WaitFor(Platform.IsWindows() ? "git.exe" : "git", repositoryDirectory,
+            $"switch -c origin/{branch}");
     }
 
     public static void GetOrUpdate(string name, string repositoryDirectory, string repositoryUri,

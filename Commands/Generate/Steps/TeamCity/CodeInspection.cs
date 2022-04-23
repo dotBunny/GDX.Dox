@@ -14,7 +14,7 @@ public class CodeInspection : StepBase
 
     static string GetPath()
     {
-        return Path.Combine(GenerateCommand.InputDirectory, ".docfx", "reports", "inspection");
+        return Path.Combine(Program.InputDirectory, ".docfx", "reports", "inspection");
     }
 
     /// <inheritdoc />
