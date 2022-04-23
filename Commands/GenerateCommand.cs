@@ -18,8 +18,8 @@ public static class GenerateCommand
 
     public const string InputKey = "input";
 
+    public static string InputDirectory = Path.Combine(Program.ProcessDirectory, "..", "..", "..", "..", "Projects", "GDX_Development", "Packages", "com.dotbunny.gdx");
 
-    public static string InputDirectory = "../../../../Projects/GDX_Development/Packages/com.dotbunny.gdx";
 
 
     /// <summary>
@@ -43,10 +43,11 @@ public static class GenerateCommand
                 }
 
                 return Path.GetFullPath(Path.Combine(Program.ProcessDirectory, s));
-            }, Directory.Exists);
+            },
+            Directory.Exists);
         if (!validInput)
         {
-            Output.Error($"Unable to find input folder ({InputDirectory}. Please provide a valid absolute path.", -1, true);
+            Output.Error($"Unable to find input folder ({InputDirectory}\nPlease provide a valid absolute path.", -1, true);
         }
         Output.Value("GenerateCommand.InputDirectory", InputDirectory);
 
