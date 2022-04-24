@@ -126,9 +126,9 @@ public static class DeployCommand
             Output.Warning("Not pushing commit as this is not in CI/CD");
             return;
         }
-        ChildProcess.WaitFor(Platform.IsWindows() ? "git.exe" : "git", TargetFolder,
-            $"push -f");
 
+        ChildProcess.WaitFor(Platform.IsWindows() ? "git.exe" : "git", TargetFolder,
+            $"push -f --set-upstream origin origin/main");
 
         Output.Log("Removing deploying / working directory.");
         Platform.NormalizeFolder(new DirectoryInfo(TargetFolder));
