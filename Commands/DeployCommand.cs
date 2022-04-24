@@ -47,11 +47,14 @@ public static class DeployCommand
         string gitRepository = null;
         if (Program.IsTeamCityAgent)
         {
-            Program.GetParameter("token", null, out string password);
+            //Program.GetParameter("token", null, out string password);
             gitRepository = TargetBranch switch
             {
-                Branch.Dev => $"https://dotBunny-BuildAgent:{password}@github.com/dotBunny/GDX.DevDocs.git",
-                Branch.Main => $"https://dotBunny-BuildAgent:{password}@github.com/dotBunny/GDX.MainDocs.git",
+
+                Branch.Dev => "git@github.com:dotBunny/GDX.DevDocs.git",
+                Branch.Main => "git@github.com:dotBunny/GDX.MainDocs.git",
+                //Branch.Dev => $"https://dotBunny-BuildAgent:{password}@github.com/dotBunny/GDX.DevDocs.git",
+                //Branch.Main => $"https://dotBunny-BuildAgent:{password}@github.com/dotBunny/GDX.MainDocs.git",
                 _ => null
             };
         }
@@ -81,10 +84,6 @@ public static class DeployCommand
         // Checkout
         Git.GetOrUpdate($"{TargetBranch.ToString()} Docs", TargetFolder, gitRepository, null, 1);
         Git.Checkout(TargetFolder, "main");
-        if (Program.IsTeamCityAgent)
-        {
-            Git.SetRemote(TargetFolder, "origin", gitRepository);
-        }
 
         // Delete the existing docs
         string docsFolder = Path.Combine(TargetFolder, "docs");
@@ -127,6 +126,7 @@ public static class DeployCommand
             return;
         }
 
+       // Git.SetRemote(TargetFolder, "origin", gitRepository);
         ChildProcess.WaitFor(Platform.IsWindows() ? "git.exe" : "git", TargetFolder,
             $"push -f --set-upstream origin origin/main");
 
