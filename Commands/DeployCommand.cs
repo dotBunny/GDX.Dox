@@ -121,12 +121,21 @@ public static class DeployCommand
         Output.LogLine($"Copying output ({sourceFolder}) to destination ({docsFolder}) ...");
         Platform.CopyFilesRecursively(Build.GetOutputFolder(), docsFolder);
 
+        Output.LogLine("Checking for differences ...");
+        bool statusCheck = Git.HasChanges(TargetFolder);
+        if (!statusCheck)
+        {
+            Cleanup();
+            Output.LogLine("No changes found stopping deploy.");
+            return;
+        }
+
         // Create commit
         Output.LogLine($"Check for head commit hash ...");
         string repoCommit = Git.GetHeadCommit(Program.InputDirectory).Substring(0, 7);
 
         Output.LogLine($"Add all new content in {TargetFolder} ...");
-        bool addContentCheck = ChildProcess.WaitFor(gitCommand, TargetFolder, "add --all");
+        bool addContentCheck = ChildProcess.WaitFor(gitCommand, TargetFolder, "add --all --verbose --renormalize");
         if (!addContentCheck)
         {
             Cleanup();
@@ -134,7 +143,7 @@ public static class DeployCommand
         }
 
         Output.LogLine($"Create commit for difference in {TargetFolder} ...");
-        bool commitCreateCheck = ChildProcess.WaitFor(gitCommand, TargetFolder, $"commit -m \"Generated documentation at {repoCommit}.\"");
+        bool commitCreateCheck = ChildProcess.WaitFor(gitCommand, TargetFolder, $"commit -m \"Generated documentation at {repoCommit}.\" --verbose");
         if (!commitCreateCheck)
         {
             Cleanup();

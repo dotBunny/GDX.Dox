@@ -53,7 +53,7 @@ public class CodeInspection : StepBase
                 "ResharperInspection.xml"));
         if (File.Exists(teamCityArtifact))
         {
-            Output.Log("Copying code inspection artifacts.");
+            Output.LogLine("Copying code inspection artifacts.");
             if (!Directory.Exists(GetPath()))
             {
                 Directory.CreateDirectory(GetPath());

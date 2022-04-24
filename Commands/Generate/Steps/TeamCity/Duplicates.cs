@@ -53,7 +53,7 @@ public class Duplicates : StepBase
                 "ResharperDuplicates.xml"));
         if (File.Exists(teamCityArtifact))
         {
-            Output.Log("Copying code duplication artifacts.");
+            Output.LogLine("Copying code duplication artifacts.");
             if (!Directory.Exists(GetPath()))
             {
                 Directory.CreateDirectory(GetPath());

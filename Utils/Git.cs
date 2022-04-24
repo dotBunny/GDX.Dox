@@ -96,4 +96,21 @@ public static class Git
             onUpdate?.Invoke();
         }
     }
+
+    public static bool HasChanges(string repositoryDirectory)
+    {
+        bool hasChange = false;
+        ChildProcess.WaitFor(Platform.IsWindows() ? "git.exe" : "git", repositoryDirectory,
+            "status --short --porcelain",
+            s =>
+            {
+                string cleanLine = s.Trim();
+                if (cleanLine.StartsWith("M ") || cleanLine.StartsWith("A ") || cleanLine.StartsWith("D "))
+                {
+                    hasChange = true;
+                }
+            });
+
+        return hasChange;
+    }
 }
