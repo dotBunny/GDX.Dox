@@ -18,17 +18,6 @@ public static class Git
         return generator.ToString();
     }
 
-    public static void Commit(string repositoryDirectory, string message)
-    {
-        string command = "git.exe";
-        if (!Platform.IsWindows())
-        {
-            command = "git";
-        }
-        ChildProcess.WaitFor(command, repositoryDirectory, "add --all");
-        ChildProcess.WaitFor(command, repositoryDirectory, $"commit -m \"{message}\"");
-    }
-
     public static void Checkout(string repositoryDirectory, string branch)
     {
         ChildProcess.WaitFor(Platform.IsWindows() ? "git.exe" : "git", repositoryDirectory,

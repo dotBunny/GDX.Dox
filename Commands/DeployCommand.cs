@@ -25,13 +25,14 @@ public static class DeployCommand
 
     public static void Process()
     {
-        Output.LogLine("Deploying ...");
+        Output.SectionHeader("Deploy To Pages");
 
         if (!Program.Args.Has(BranchKey))
         {
-            Output.Error("The branch must be set via argument.", -1, true);
+            Output.Error($"The branch must be set via argument (--{BranchKey} <main/dev>).", -1, true);
         }
 
+        // Figure out what branch we are working on.
         Program.GetParameter(BranchKey, null, out string branch);
         TargetBranch = branch.ToLower() switch
         {
@@ -44,17 +45,18 @@ public static class DeployCommand
             Output.Error("Unrecognized branch.", -1, true);
         }
 
+
+
+        // Populate the git repository URI based on if we are in CI/CD where we can count on SSH, falling back to
+        // HTTPS route if were not allowing for user authentication to take place.
         string gitRepository = null;
         if (Program.IsTeamCityAgent)
         {
-            //Program.GetParameter("token", null, out string password);
             gitRepository = TargetBranch switch
             {
 
                 Branch.Dev => "git@github.com:dotBunny/GDX.DevDocs.git",
                 Branch.Main => "git@github.com:dotBunny/GDX.MainDocs.git",
-                //Branch.Dev => $"https://dotBunny-BuildAgent:{password}@github.com/dotBunny/GDX.DevDocs.git",
-                //Branch.Main => $"https://dotBunny-BuildAgent:{password}@github.com/dotBunny/GDX.MainDocs.git",
                 _ => null
             };
         }
@@ -68,6 +70,7 @@ public static class DeployCommand
             };
         }
 
+        // If we dont have a URI we have problems.
         if (gitRepository == null)
         {
             Output.Error("Unable to properly identify Git repository.", -1, true);
@@ -76,63 +79,57 @@ public static class DeployCommand
         // We do not want any preexisting conflicts
         if (Directory.Exists(TargetFolder))
         {
+            Output.LogLine($"Deleting existing content in {TargetFolder} ...");
             DirectoryInfo di = new DirectoryInfo(TargetFolder);
             Platform.NormalizeFolder(di);
             Directory.Delete(TargetFolder, true);
         }
 
-        // Checkout
-        Output.SectionHeader("Git: Clone");
-        Git.GetOrUpdate($"{TargetBranch.ToString()} Docs", TargetFolder, gitRepository, null, 1);
-        Output.SectionHeader("Git: Checkout Main");
-        Git.Checkout(TargetFolder, "main");
-//         if (Program.IsTeamCityAgent)
-//         {
-//             Output.SectionHeader("Git: Set Upstream");
-//             /*
-//              * git.exe branch --set-upstream-to origin/main
-// 17:20:58   warning: refname 'origin/main' is ambiguous.
-// 17:20:58   fatal: Ambiguous object name: 'origin/main'.
-//              */
-//             ChildProcess.WaitFor(Platform.IsWindows() ? "git.exe" : "git", TargetFolder,
-//                 $"branch --set-upstream-to origin/main");
-//         }
+        // Figure out git command to use once.
+        string gitCommand = Platform.IsWindows() ? "git.exe" : "git";
 
-        // Delete the existing docs
+        // Checkout
+        Output.LogLine($"Cloning repository {gitRepository} into {TargetFolder} ...");
+        Git.GetOrUpdate($"{TargetBranch.ToString()} Docs", TargetFolder, gitRepository, null, 1);
+
+        // Cache reference to where the docs are going to be living
         string docsFolder = Path.Combine(TargetFolder, "docs");
 
-        // Preserve CNAME
+        // We need to remove everything, but we also need to preserver the CNAME file to ensure hosting persists.
         bool hasCNAME = false;
         string tempFile = Path.Combine(Program.ProcessDirectory, "cname.tmp");
         string cnameFile = Path.Combine(docsFolder, "CNAME");
         if (File.Exists(cnameFile))
         {
+            Output.Log("Backing up CNAME ...");
             File.Copy(cnameFile, tempFile);
             hasCNAME = true;
         }
 
+        Output.LogLine("Deleting existing documentation in repository ...");
         Directory.Delete(docsFolder, true);
         Directory.CreateDirectory(docsFolder);
-
-        // Put back CNAME
         if (hasCNAME)
         {
+            Output.Log("Restoring CNAME ...");
             File.Copy(tempFile, cnameFile);
         }
-
         File.Delete(tempFile);
 
         // Move set in place
-        Output.SectionHeader("Copy Content");
         string sourceFolder = Build.GetOutputFolder();
-        Output.LogLine($"Copying output ({sourceFolder}) to destination ({docsFolder}).");
+        Output.LogLine($"Copying output ({sourceFolder}) to destination ({docsFolder}) ...");
         Platform.CopyFilesRecursively(Build.GetOutputFolder(), docsFolder);
 
         // Create commit
-        Output.SectionHeader("Git: Create Commit");
+        Output.LogLine($"[Git] Check for head commit hash ...");
         string repoCommit = Git.GetHeadCommit(Program.InputDirectory).Substring(0, 7);
-        string commitMessage = $"Generated documentation at {repoCommit}.";
-        Git.Commit(TargetFolder, commitMessage);
+
+        Output.LogLine($"[Git] Add all new content in {TargetFolder} ...");
+        ChildProcess.WaitFor(gitCommand, TargetFolder, "add --all");
+
+        Output.LogLine($"[Git] Create commit for difference in {TargetFolder} ...");
+        ChildProcess.WaitFor(gitCommand, TargetFolder, $"commit -m \"Generated documentation at {repoCommit}.\"");
 
         // Push
         if (!Program.IsTeamCityAgent)
@@ -141,12 +138,11 @@ public static class DeployCommand
             return;
         }
 
-        Output.SectionHeader("Git: Push");
+        Output.LogLine("[Git] Pushing upstream ...");
         ChildProcess.WaitFor(Platform.IsWindows() ? "git.exe" : "git", TargetFolder,
             $"push -f origin refs/heads/main --verbose");
 
-        Output.SectionHeader("Cleanup");
-        Output.Log("Removing deploying / working directory.");
+        Output.LogLine("Removing deploying / working directory ...");
         Platform.NormalizeFolder(new DirectoryInfo(TargetFolder));
         Directory.Delete(TargetFolder, true);
     }
