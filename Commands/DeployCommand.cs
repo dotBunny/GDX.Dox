@@ -84,6 +84,13 @@ public static class DeployCommand
         // Checkout
         Git.GetOrUpdate($"{TargetBranch.ToString()} Docs", TargetFolder, gitRepository, null, 1);
         Git.Checkout(TargetFolder, "main");
+        if (Program.IsTeamCityAgent)
+        {
+            ChildProcess.WaitFor(Platform.IsWindows() ? "git.exe" : "git", TargetFolder,
+                $"--set-upstream origin main");
+        }
+
+
 
         // Delete the existing docs
         string docsFolder = Path.Combine(TargetFolder, "docs");
@@ -126,9 +133,8 @@ public static class DeployCommand
             return;
         }
 
-       // Git.SetRemote(TargetFolder, "origin", gitRepository);
         ChildProcess.WaitFor(Platform.IsWindows() ? "git.exe" : "git", TargetFolder,
-            $"push -f --set-upstream origin main");
+            $"push -f main");
 
         Output.Log("Removing deploying / working directory.");
         Platform.NormalizeFolder(new DirectoryInfo(TargetFolder));
