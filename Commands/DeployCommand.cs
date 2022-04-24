@@ -82,15 +82,16 @@ public static class DeployCommand
         }
 
         // Checkout
+        Output.SectionHeader("Git: Clone");
         Git.GetOrUpdate($"{TargetBranch.ToString()} Docs", TargetFolder, gitRepository, null, 1);
+        Output.SectionHeader("Git: Checkout Main");
         Git.Checkout(TargetFolder, "main");
         if (Program.IsTeamCityAgent)
         {
+            Output.SectionHeader("Git: Set Upstream");
             ChildProcess.WaitFor(Platform.IsWindows() ? "git.exe" : "git", TargetFolder,
-                $"--set-upstream origin main");
+                $"branch --set-upstream-to origin/main");
         }
-
-
 
         // Delete the existing docs
         string docsFolder = Path.Combine(TargetFolder, "docs");
@@ -117,11 +118,13 @@ public static class DeployCommand
         File.Delete(tempFile);
 
         // Move set in place
+        Output.SectionHeader("Copy Content");
         string sourceFolder = Build.GetOutputFolder();
         Output.LogLine($"Copying output ({sourceFolder}) to destination ({docsFolder}).");
         Platform.CopyFilesRecursively(Build.GetOutputFolder(), docsFolder);
 
         // Create commit
+        Output.SectionHeader("Git: Create Commit");
         string repoCommit = Git.GetHeadCommit(Program.InputDirectory).Substring(0, 7);
         string commitMessage = $"Generated documentation at {repoCommit}.";
         Git.Commit(TargetFolder, commitMessage);
@@ -133,9 +136,11 @@ public static class DeployCommand
             return;
         }
 
+        Output.SectionHeader("Git: Push");
         ChildProcess.WaitFor(Platform.IsWindows() ? "git.exe" : "git", TargetFolder,
             $"push -f main");
 
+        Output.SectionHeader("Cleanup");
         Output.Log("Removing deploying / working directory.");
         Platform.NormalizeFolder(new DirectoryInfo(TargetFolder));
         Directory.Delete(TargetFolder, true);
