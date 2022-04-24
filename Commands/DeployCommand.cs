@@ -128,7 +128,7 @@ public static class DeployCommand
 
        // Git.SetRemote(TargetFolder, "origin", gitRepository);
         ChildProcess.WaitFor(Platform.IsWindows() ? "git.exe" : "git", TargetFolder,
-            $"push -f --set-upstream origin origin/main");
+            $"push -f --set-upstream origin main");
 
         Output.Log("Removing deploying / working directory.");
         Platform.NormalizeFolder(new DirectoryInfo(TargetFolder));
