@@ -122,29 +122,52 @@ public static class DeployCommand
         Platform.CopyFilesRecursively(Build.GetOutputFolder(), docsFolder);
 
         // Create commit
-        Output.LogLine($"[Git] Check for head commit hash ...");
+        Output.LogLine($"Check for head commit hash ...");
         string repoCommit = Git.GetHeadCommit(Program.InputDirectory).Substring(0, 7);
 
-        Output.LogLine($"[Git] Add all new content in {TargetFolder} ...");
-        ChildProcess.WaitFor(gitCommand, TargetFolder, "add --all");
+        Output.LogLine($"Add all new content in {TargetFolder} ...");
+        bool addContentCheck = ChildProcess.WaitFor(gitCommand, TargetFolder, "add --all");
+        if (!addContentCheck)
+        {
+            Cleanup();
+            Output.Error("Adding output failed to execute cleanly.", -1, true);
+        }
 
-        Output.LogLine($"[Git] Create commit for difference in {TargetFolder} ...");
-        ChildProcess.WaitFor(gitCommand, TargetFolder, $"commit -m \"Generated documentation at {repoCommit}.\"");
+        Output.LogLine($"Create commit for difference in {TargetFolder} ...");
+        bool commitCreateCheck = ChildProcess.WaitFor(gitCommand, TargetFolder, $"commit -m \"Generated documentation at {repoCommit}.\"");
+        if (!commitCreateCheck)
+        {
+            Cleanup();
+            Output.Error("Creating commit failed to execute cleanly.", -1, true);
+        }
 
-        // Push
+        // Pushing automagically happens only on the CI/CD
         if (!Program.IsTeamCityAgent)
         {
             Output.Warning("Not pushing commit as this is not in CI/CD");
             return;
         }
 
-        Output.LogLine("[Git] Pushing upstream ...");
-        ChildProcess.WaitFor(Platform.IsWindows() ? "git.exe" : "git", TargetFolder,
+        Output.LogLine("Pushing upstream ...");
+        bool pushCheck = ChildProcess.WaitFor(gitCommand, TargetFolder,
             $"push -f origin refs/heads/main --verbose");
+        if (!pushCheck)
+        {
+            Cleanup();
+            Output.Error("Pushing to remote failed to execute cleanly.", -1, true);
+        }
 
-        Output.LogLine("Removing deploying / working directory ...");
-        Platform.NormalizeFolder(new DirectoryInfo(TargetFolder));
-        Directory.Delete(TargetFolder, true);
+        Cleanup();
+    }
+
+    public static void Cleanup()
+    {
+        if (Directory.Exists(TargetFolder))
+        {
+            Output.LogLine("Removing deploying / working directory ...");
+            Platform.NormalizeFolder(new DirectoryInfo(TargetFolder));
+            Directory.Delete(TargetFolder, true);
+        }
     }
 
 

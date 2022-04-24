@@ -18,18 +18,6 @@ public static class Git
         return generator.ToString();
     }
 
-    public static void Checkout(string repositoryDirectory, string branch)
-    {
-        ChildProcess.WaitFor(Platform.IsWindows() ? "git.exe" : "git", repositoryDirectory,
-            $"switch -c origin/{branch}");
-    }
-
-    public static void SetRemote(string repositoryDirectory, string remote, string uri)
-    {
-        ChildProcess.WaitFor(Platform.IsWindows() ? "git.exe" : "git", repositoryDirectory,
-            $"remote set-url {remote} {uri}");
-    }
-
     public static void GetOrUpdate(string name, string repositoryDirectory, string repositoryUri,
         Action onUpdate = null, int depth = -1)
     {
