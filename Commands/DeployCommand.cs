@@ -52,8 +52,8 @@ public static class DeployCommand
             Program.GetParameter("token", null, out string password);
             gitRepository = TargetBranch switch
             {
-                Branch.Dev => $"https://dotBunny-BuildAgent:{password}@github.com/dotBunny/GDX.DevDocs",
-                Branch.Main => $"https://dotBunny-BuildAgent:{password}@github.com/dotBunny/GDX.MainDocs",
+                Branch.Dev => $"https://dotBunny-BuildAgent:{password}@github.com/dotBunny/GDX.DevDocs.git",
+                Branch.Main => $"https://dotBunny-BuildAgent:{password}@github.com/dotBunny/GDX.MainDocs.git",
                 _ => null
             };
         }
@@ -81,7 +81,7 @@ public static class DeployCommand
         }
 
         // Checkout
-        Git.GetOrUpdate($"{TargetBranch.ToString()} Docs", TargetFolder, gitRepository);
+        Git.GetOrUpdate($"{TargetBranch.ToString()} Docs", TargetFolder, gitRepository, null, 1);
         Git.Checkout(TargetFolder, "main");
 
         // Delete the existing docs

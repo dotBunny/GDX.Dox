@@ -36,7 +36,7 @@ public static class Git
     }
 
     public static void GetOrUpdate(string name, string repositoryDirectory, string repositoryUri,
-        Action onUpdate = null)
+        Action onUpdate = null, int depth = -1)
     {
         if (Directory.Exists(repositoryDirectory))
         {
@@ -101,8 +101,11 @@ public static class Git
         else
         {
             Output.LogLine($"Getting latest {name} source ...");
+
             if (!ChildProcess.WaitFor("git.exe", Program.ProcessDirectory,
-                    $"clone {repositoryUri} {repositoryDirectory}"))
+                    depth == -1 ?
+                        $"clone {repositoryUri} {repositoryDirectory}" :
+                        $"clone --depth={depth} {repositoryUri} {repositoryDirectory}"))
             {
                 Output.Error($"Unable to clone {name}.", -1, true);
             }
