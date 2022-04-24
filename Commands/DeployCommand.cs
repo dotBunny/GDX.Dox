@@ -2,7 +2,6 @@
 // dotBunny licenses this file to you under the BSL-1.0 license.
 // See the LICENSE file in the project root for more information.
 
-using System;
 using System.IO;
 using Dox.Commands.Generate.Steps;
 using Dox.Utils;
@@ -83,6 +82,10 @@ public static class DeployCommand
         // Checkout
         Git.GetOrUpdate($"{TargetBranch.ToString()} Docs", TargetFolder, gitRepository, null, 1);
         Git.Checkout(TargetFolder, "main");
+        if (Program.IsTeamCityAgent)
+        {
+            Git.SetRemote(TargetFolder, "origin", gitRepository);
+        }
 
         // Delete the existing docs
         string docsFolder = Path.Combine(TargetFolder, "docs");
@@ -126,6 +129,11 @@ public static class DeployCommand
         }
         ChildProcess.WaitFor(Platform.IsWindows() ? "git.exe" : "git", TargetFolder,
             $"push origin main");
+
+
+        Output.Log("Removing deploying / working directory.");
+        Platform.NormalizeFolder(new DirectoryInfo(TargetFolder));
+        Directory.Delete(TargetFolder, true);
     }
 
 
