@@ -49,7 +49,7 @@ public class CodeInspection : StepBase
         }
 
         string teamCityArtifact =
-            Path.GetFullPath(Path.Combine(Program.ProcessDirectory, "..", "..", "..", "Staging",
+            Path.GetFullPath(Path.Combine(Program.ProcessDirectory, "..", "..", "..", "..", "Staging",
                 "ResharperInspection.xml"));
         if (File.Exists(teamCityArtifact))
         {

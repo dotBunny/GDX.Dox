@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2020-2022 dotBunny Inc.
 // dotBunny licenses this file to you under the BSL-1.0 license.
 // See the LICENSE file in the project root for more information.
-
 using System.IO;
 using Dox.Commands.Generate.Steps;
 using Dox.Utils;
@@ -128,7 +127,7 @@ public static class DeployCommand
             return;
         }
         ChildProcess.WaitFor(Platform.IsWindows() ? "git.exe" : "git", TargetFolder,
-            $"push origin main");
+            $"push -f");
 
 
         Output.Log("Removing deploying / working directory.");

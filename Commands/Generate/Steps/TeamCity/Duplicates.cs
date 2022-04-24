@@ -49,7 +49,7 @@ public class Duplicates : StepBase
         }
 
         string teamCityArtifact =
-            Path.GetFullPath(Path.Combine(Program.ProcessDirectory, "..", "..", "..", "Staging",
+            Path.GetFullPath(Path.Combine(Program.ProcessDirectory, "..", "..", "..", "..", "Staging",
                 "ResharperDuplicates.xml"));
         if (File.Exists(teamCityArtifact))
         {

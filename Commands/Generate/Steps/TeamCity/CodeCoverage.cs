@@ -49,7 +49,7 @@ public class CodeCoverage : StepBase
         }
 
         string teamCityArtifact =
-            Path.GetFullPath(Path.Combine(Program.ProcessDirectory, "..", "..", "..", "Staging", "CodeCoverage"));
+            Path.GetFullPath(Path.Combine(Program.ProcessDirectory, "..", "..", "..", "..", "Staging", "CodeCoverage"));
 
         if (Directory.Exists(teamCityArtifact))
         {
