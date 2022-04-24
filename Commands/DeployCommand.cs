@@ -46,12 +46,27 @@ public static class DeployCommand
             Output.Error("Unrecognized branch.", -1, true);
         }
 
-        string gitRepository = TargetBranch switch
+        string gitRepository = null;
+        if (Program.IsTeamCityAgent)
         {
-            Branch.Dev => "https://github.com/dotBunny/GDX.DevDocs",
-            Branch.Main => "https://github.com/dotBunny/GDX.MainDocs",
-            _ => null
-        };
+            Program.GetParameter("token", null, out string password);
+            gitRepository = TargetBranch switch
+            {
+                Branch.Dev => $"https://dotBunny-BuildAgent:{password}@github.com/dotBunny/GDX.DevDocs",
+                Branch.Main => $"https://dotBunny-BuildAgent:{password}@github.com/dotBunny/GDX.MainDocs",
+                _ => null
+            };
+        }
+        else
+        {
+            gitRepository = TargetBranch switch
+            {
+                Branch.Dev => $"https://github.com/dotBunny/GDX.DevDocs",
+                Branch.Main => $"https://github.com/dotBunny/GDX.MainDocs",
+                _ => null
+            };
+        }
+
         if (gitRepository == null)
         {
             Output.Error("Unable to properly identify Git repository.", -1, true);
