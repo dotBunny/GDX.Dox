@@ -86,12 +86,17 @@ public static class DeployCommand
         Git.GetOrUpdate($"{TargetBranch.ToString()} Docs", TargetFolder, gitRepository, null, 1);
         Output.SectionHeader("Git: Checkout Main");
         Git.Checkout(TargetFolder, "main");
-        if (Program.IsTeamCityAgent)
-        {
-            Output.SectionHeader("Git: Set Upstream");
-            ChildProcess.WaitFor(Platform.IsWindows() ? "git.exe" : "git", TargetFolder,
-                $"branch --set-upstream-to origin/main");
-        }
+//         if (Program.IsTeamCityAgent)
+//         {
+//             Output.SectionHeader("Git: Set Upstream");
+//             /*
+//              * git.exe branch --set-upstream-to origin/main
+// 17:20:58   warning: refname 'origin/main' is ambiguous.
+// 17:20:58   fatal: Ambiguous object name: 'origin/main'.
+//              */
+//             ChildProcess.WaitFor(Platform.IsWindows() ? "git.exe" : "git", TargetFolder,
+//                 $"branch --set-upstream-to origin/main");
+//         }
 
         // Delete the existing docs
         string docsFolder = Path.Combine(TargetFolder, "docs");
@@ -138,7 +143,7 @@ public static class DeployCommand
 
         Output.SectionHeader("Git: Push");
         ChildProcess.WaitFor(Platform.IsWindows() ? "git.exe" : "git", TargetFolder,
-            $"push -f main");
+            $"push -f origin refs/heads/main --verbose");
 
         Output.SectionHeader("Cleanup");
         Output.Log("Removing deploying / working directory.");
