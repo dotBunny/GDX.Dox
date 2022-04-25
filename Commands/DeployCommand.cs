@@ -107,6 +107,7 @@ public static class DeployCommand
         {
             Cleanup();
             Output.LogLine("Generated previously against commit version. To forcibly regenerate pass --force.");
+            return;
         }
 
         // Cache reference to where the docs are going to be living
