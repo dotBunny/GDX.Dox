@@ -92,6 +92,23 @@ public static class DeployCommand
         Output.LogLine($"Cloning repository {gitRepository} into {TargetFolder} ...");
         Git.GetOrUpdate($"{TargetBranch.ToString()} Docs", TargetFolder, gitRepository, null, 1);
 
+        Output.LogLine($"Check for head commit hash ...");
+        string repoCommit = Git.GetHeadCommit(Program.InputDirectory).Substring(0, 7).Trim();
+
+        // We need to see if we actually need to regenerate based on the last commit (and if theres force)
+        string commitFile = Path.Combine(TargetFolder, "COMMIT");
+        string lastCommit = null;
+        if (File.Exists(commitFile))
+        {
+            lastCommit = File.ReadAllText(commitFile).Trim();
+        }
+
+        if (lastCommit != null && lastCommit == repoCommit && !Program.Args.Has("force") && Program.IsTeamCityAgent)
+        {
+            Cleanup();
+            Output.LogLine("Generated previously against commit version. To forcibly regenerate pass --force.");
+        }
+
         // Cache reference to where the docs are going to be living
         string docsFolder = Path.Combine(TargetFolder, "docs");
 
@@ -101,7 +118,7 @@ public static class DeployCommand
         string cnameFile = Path.Combine(docsFolder, "CNAME");
         if (File.Exists(cnameFile))
         {
-            Output.Log("Backing up CNAME ...");
+            Output.LogLine("Backing up CNAME ...");
             File.Copy(cnameFile, tempFile);
             hasCNAME = true;
         }
@@ -111,7 +128,7 @@ public static class DeployCommand
         Directory.CreateDirectory(docsFolder);
         if (hasCNAME)
         {
-            Output.Log("Restoring CNAME ...");
+            Output.LogLine("Restoring CNAME ...");
             File.Copy(tempFile, cnameFile);
         }
         File.Delete(tempFile);
@@ -129,17 +146,22 @@ public static class DeployCommand
             Output.LogLine("No changes found stopping deploy.");
             return;
         }
+        File.WriteAllText(commitFile, repoCommit);
 
         // Create commit
-        Output.LogLine($"Check for head commit hash ...");
-        string repoCommit = Git.GetHeadCommit(Program.InputDirectory).Substring(0, 7);
+        Output.LogLine($"Add content changes in {TargetFolder} ...");
+        bool updateContentCheck = ChildProcess.WaitFor(gitCommand, TargetFolder, "add --update .");
+        if (!updateContentCheck)
+        {
+            Cleanup();
+            Output.Error("Updating existing tracked content failed to execute cleanly.", -1, true);
+        }
 
-        Output.LogLine($"Add all new content in {TargetFolder} ...");
-        bool addContentCheck = ChildProcess.WaitFor(gitCommand, TargetFolder, "add --all --verbose --renormalize");
+        bool addContentCheck = ChildProcess.WaitFor(gitCommand, TargetFolder, "add --all .");
         if (!addContentCheck)
         {
             Cleanup();
-            Output.Error("Adding output failed to execute cleanly.", -1, true);
+            Output.Error("Adding new content failed to execute cleanly.", -1, true);
         }
 
         Output.LogLine($"Create commit for difference in {TargetFolder} ...");
