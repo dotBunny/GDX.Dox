@@ -52,6 +52,7 @@ public class License : StepBase
         Output.LogLine($"Reading existing License from {contentPath}.");
 
         TextGenerator generator = new();
+        generator.AppendLine("# License");
         generator.AppendLineRange(File.ReadAllLines(contentPath));
 
         Output.LogLine($"Writing updated License to {path}.");
