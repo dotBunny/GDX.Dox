@@ -47,11 +47,6 @@ public class Portability : StepBase
         return Path.Combine(Program.InputDirectory, ".docfx", "reports", "portability");
     }
 
-    string GetJsonPath()
-    {
-        return Path.Combine(GetPath(), "portability.json");
-    }
-
     string GetHtmlPath()
     {
         return Path.Combine(GetPath(), "index.html");
@@ -86,20 +81,28 @@ public class Portability : StepBase
             return;
         }
 
-        bool jsonExecute = ChildProcess.WaitFor(
-            Path.Combine(ApiPort.InstallPath, "ApiPort.exe"),
-            ApiPort.InstallPath,
-            $"analyze -f {gdxLibraryPath} -f {gdxEditorLibraryPath} -o {GetJsonPath()} -r json");
+        string htmlFilePath = GetHtmlPath();
         bool htmlExecute = ChildProcess.WaitFor(
             Path.Combine(ApiPort.InstallPath, "ApiPort.exe"),
             ApiPort.InstallPath,
-            $"analyze -f {gdxLibraryPath} -f {gdxEditorLibraryPath} -o {GetHtmlPath()} -r html");
+            $"analyze -f {gdxLibraryPath} -f {gdxEditorLibraryPath} -o {htmlFilePath} -r html");
         bool dgmlExecute = ChildProcess.WaitFor(
             Path.Combine(ApiPort.InstallPath, "ApiPort.exe"),
             ApiPort.InstallPath,
             $"analyze -f {gdxLibraryPath} -f {gdxEditorLibraryPath} -o {GetDgmlPath()} -r dgml");
 
-        if (!jsonExecute || !htmlExecute || !dgmlExecute)
+
+        // // Manipulate HTML to something that we can change
+        // if (File.Exists(htmlFilePath))
+        // {
+        //     Output.LogLine($"Altering {htmlFilePath}.");
+        //     Html.HtmlObject html = Html.BuildObject(File.ReadAllText(GetHtmlPath()));
+        //
+        //     // TextGenerator generator = new TextGenerator();
+        //     // generator.AppendLine();
+        // }
+
+        if (!htmlExecute || !dgmlExecute)
         {
             Output.Error("ApiPort did not execute successfully.", -1, true);
         }
