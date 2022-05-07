@@ -50,5 +50,10 @@ public class ProjectFiles : StepBase
         {
             Output.Error("An error occured while generating project files.", -1, true);
         }
+
+        if (!File.Exists(testForProject))
+        {
+            Output.Error("Even after generation, unable to find GDX.csproj. Something has gone wrong.", -1, true);
+        }
     }
 }
