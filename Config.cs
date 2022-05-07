@@ -16,7 +16,7 @@ namespace Dox;
 
 public static class Config
 {
-    public const string DoxUri = "https://github.com/dotBunny/GDX.Documentation/";
+    public const string DoxUri = "https://github.com/dotBunny/GDX.Dox/";
     public const string DocFxUri = "https://dotnet.github.io/docfx/";
 
     public const string GitCommit = "https://github.com/dotBunny/GDX/commit/";
