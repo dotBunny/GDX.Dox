@@ -45,8 +45,6 @@ public static class DeployCommand
             Output.Error("Unrecognized branch.", -1, true);
         }
 
-
-
         // Populate the git repository URI based on if we are in CI/CD where we can count on SSH, falling back to
         // HTTPS route if were not allowing for user authentication to take place.
         string gitRepository = null;
@@ -138,6 +136,16 @@ public static class DeployCommand
         string sourceFolder = Build.GetOutputFolder();
         Output.LogLine($"Copying output ({sourceFolder}) to destination ({docsFolder}) ...");
         Platform.CopyFilesRecursively(Build.GetOutputFolder(), docsFolder);
+
+        // Adjust links
+        if (TargetBranch == Branch.Dev)
+        {
+            Links.ModifyContent(docsFolder, Links.Host.Main);
+        }
+        else
+        {
+            Links.ModifyContent(docsFolder, Links.Host.Main);
+        }
 
         Output.LogLine("Checking for differences ...");
         bool statusCheck = Git.HasChanges(TargetFolder);
