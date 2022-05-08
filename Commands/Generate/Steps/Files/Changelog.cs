@@ -53,7 +53,6 @@ public class Changelog : StepBase
 
         TextGenerator generator = new();
         generator.AppendLine("---");
-        generator.AppendLine("_disableBreadcrumb: true");
         generator.AppendLine("_disableContribution: true");
         generator.AppendLine("---");
         generator.AppendLineRange(File.ReadAllLines(contentPath));
