@@ -138,14 +138,7 @@ public static class DeployCommand
         Platform.CopyFilesRecursively(Build.GetOutputFolder(), docsFolder);
 
         // Adjust links
-        if (TargetBranch == Branch.Dev)
-        {
-            Links.ModifyContent(docsFolder, Links.Host.Main);
-        }
-        else
-        {
-            Links.ModifyContent(docsFolder, Links.Host.Main);
-        }
+        Links.ModifyContent(docsFolder, TargetBranch == Branch.Dev ? Links.Host.Dev : Links.Host.Main);
 
         Output.LogLine("Checking for differences ...");
         bool statusCheck = Git.HasChanges(TargetFolder);
