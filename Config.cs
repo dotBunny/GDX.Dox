@@ -31,7 +31,7 @@ public static class Config
     {
         DocFx.Key, ApiPort.Key, Clean.Key, Changelog.Key, SecurityPolicy.Key, CodeOfConduct.Key, License.Key,
         Footer.Key, ProjectFiles.Key, XmlDocs.Key, Portability.Key, CodeInspection.Key,
-        Duplicates.Key, CodeCoverage.Key, Metadata.Key, TableOfContents.Key , Build.Key, Host.Key
+        CodeCoverage.Key, Metadata.Key, TableOfContents.Key , Build.Key, Host.Key
     };
 
     public static readonly string CleanBuildSteps = AllSteps.Concatenate(",");

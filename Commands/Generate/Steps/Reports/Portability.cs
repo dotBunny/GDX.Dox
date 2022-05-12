@@ -2,9 +2,13 @@
 // dotBunny licenses this file to you under the BSL-1.0 license.
 // See the LICENSE file in the project root for more information.
 
+using System.Collections.Generic;
 using System.IO;
 using Dox.Commands.Generate.Steps.Unpack;
 using Dox.Utils;
+using HtmlAgilityPack;
+using System.Linq;
+using System.Text;
 
 namespace Dox.Commands.Generate.Steps.Reports;
 
@@ -22,11 +26,9 @@ public class Portability : StepBase
     /// <inheritdoc />
     public override void Clean()
     {
-        string folder = GetPath();
-        if (Directory.Exists(folder))
+        if (File.Exists(GetDgmlPath()))
         {
-            Directory.Delete(folder, true);
-            Output.LogLine("Removed previous portability report.");
+            File.Delete(GetDgmlPath());
         }
     }
 
@@ -42,19 +44,14 @@ public class Portability : StepBase
         return "API Portability";
     }
 
-    static string GetPath()
+    string GetMarkdownPath()
     {
-        return Path.Combine(Program.InputDirectory, ".docfx", "reports", "portability");
-    }
-
-    string GetHtmlPath()
-    {
-        return Path.Combine(GetPath(), "index.html");
+        return Path.Combine(Program.InputDirectory, ".docfx", "reports", "portability.md");
     }
 
     string GetDgmlPath()
     {
-        return Path.Combine(GetPath(), "portability.dgml");
+        return Path.Combine(Program.InputDirectory, ".docfx", "reports", "portability.dgml");
     }
 
 
@@ -81,26 +78,71 @@ public class Portability : StepBase
             return;
         }
 
-        string htmlFilePath = GetHtmlPath();
+        string tempFile = $"{Path.GetTempFileName()}.html";
+
         bool htmlExecute = ChildProcess.WaitFor(
             Path.Combine(ApiPort.InstallPath, "ApiPort.exe"),
             ApiPort.InstallPath,
-            $"analyze -f {gdxLibraryPath} -f {gdxEditorLibraryPath} -o {htmlFilePath} -r html");
+            $"analyze -f {gdxLibraryPath} -f {gdxEditorLibraryPath} -o {tempFile} -r html");
         bool dgmlExecute = ChildProcess.WaitFor(
             Path.Combine(ApiPort.InstallPath, "ApiPort.exe"),
             ApiPort.InstallPath,
             $"analyze -f {gdxLibraryPath} -f {gdxEditorLibraryPath} -o {GetDgmlPath()} -r dgml");
 
 
-        // // Manipulate HTML to something that we can change
-        // if (File.Exists(htmlFilePath))
-        // {
-        //     Output.LogLine($"Altering {htmlFilePath}.");
-        //     Html.HtmlObject html = Html.BuildObject(File.ReadAllText(GetHtmlPath()));
-        //
-        //     // TextGenerator generator = new TextGenerator();
-        //     // generator.AppendLine();
-        // }
+        // Manipulate HTML to something that we can change
+        if (File.Exists(tempFile))
+        {
+            Output.LogLine($"Converting {tempFile} to Markdown.");
+            HtmlAgilityPack.HtmlDocument doc = new HtmlDocument();
+            doc.LoadHtml(File.ReadAllText(tempFile));
+            //File.WriteAllText(Path.Combine(Program.InputDirectory, "test.html"), File.ReadAllText(tempFile));
+            TextGenerator generator = new TextGenerator();
+            generator.AppendLine("---");
+            generator.AppendLine("_disableContribution: true");
+            generator.AppendLine("---");
+
+
+            HtmlNode firstHeader = doc.DocumentNode.Descendants("h1").First();
+            generator.AppendLine($"# {firstHeader.InnerHtml}");
+            generator.AppendLine();
+            generator.AppendLine("[DGML](/reports/portability.dgml)");
+
+            HtmlNodeCollection nodes = doc.DocumentNode.SelectNodes("//table[@id='Portability Summary']//tr"); //|th|td|a[@href]
+            int rowIndex = 0;
+            StringBuilder rowBuilder = new();
+            foreach (HtmlNode row in nodes)
+            {
+                rowBuilder.Clear();
+                rowIndex += 1;
+                if (rowIndex == 1)
+                {
+                    StringBuilder headerBuilder = new();
+                    foreach (HtmlNode col in row.SelectNodes("th"))
+                    {
+                        rowBuilder.Append(col.InnerText.Trim());
+                        rowBuilder.Append(" | ");
+                        headerBuilder.Append("---- |");
+                    }
+
+                    generator.AppendLine(rowBuilder.ToString().Trim().TrimEnd('|').Trim());
+                    generator.AppendLine(headerBuilder.ToString().Trim().TrimEnd('|').Trim());
+                }
+                else
+                {
+                    foreach (HtmlNode col in row.SelectNodes("td|th/a[@href]"))
+                    {
+                        rowBuilder.Append(col.InnerText.Trim());
+                        rowBuilder.Append(" | ");
+                    }
+
+                    generator.AppendLine(rowBuilder.ToString().Trim().TrimEnd('|').Trim());
+                }
+            }
+
+            File.WriteAllText(GetMarkdownPath(), generator.ToString());
+            File.Delete(tempFile);
+        }
 
         if (!htmlExecute || !dgmlExecute)
         {
