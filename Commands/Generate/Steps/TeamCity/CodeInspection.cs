@@ -76,6 +76,11 @@ public class CodeInspection : StepBase
             Output.NextLine();
             Output.LogLine("END XLST");
 
+            Output.LogLine("START MD");
+            Output.Log(generator.ToString());
+            Output.NextLine();
+            Output.LogLine("END MD");
+
             File.Delete(tempPath);
             Output.LogLine("Built code inspection markdown.");
         }
@@ -109,7 +114,6 @@ public class CodeInspection : StepBase
 
         generator.AppendLine(
             "<xsl:value-of select=\"@File\"/> | <xsl:value-of select=\"@Line\"/> | <xsl:value-of select=\"@Message\"/>");
-        generator.AppendLine(); 
         generator.PopIndent();
 
         generator.AppendLine("</xsl:for-each>");
