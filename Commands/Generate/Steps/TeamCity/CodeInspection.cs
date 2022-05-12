@@ -109,6 +109,7 @@ public class CodeInspection : StepBase
 
         generator.AppendLine(
             "<xsl:value-of select=\"@File\"/> | <xsl:value-of select=\"@Line\"/> | <xsl:value-of select=\"@Message\"/>");
+        generator.AppendLine(); 
         generator.PopIndent();
 
         generator.AppendLine("</xsl:for-each>");
