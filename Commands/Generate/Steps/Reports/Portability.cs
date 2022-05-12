@@ -107,6 +107,7 @@ public class Portability : StepBase
             generator.AppendLine($"# {firstHeader.InnerHtml}");
             generator.AppendLine();
             generator.AppendLine("[DGML](/reports/portability.dgml)");
+            generator.AppendLine();
 
             HtmlNodeCollection nodes = doc.DocumentNode.SelectNodes("//table[@id='Portability Summary']//tr"); //|th|td|a[@href]
             int rowIndex = 0;

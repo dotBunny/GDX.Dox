@@ -54,12 +54,23 @@ public class CodeInspection : StepBase
         if (File.Exists(teamCityArtifact))
         {
             // Build transformation
+            string tempPath = Path.GetTempFileName();
             XslTransform transform = new();
             StringReader transformReader = new(GetTransformation());
             XmlReader reader = XmlReader.Create(transformReader);
             transform.Load(reader);
-            transform.Transform(teamCityArtifact, GetPath());
+            transform.Transform(teamCityArtifact, tempPath);
             transformReader.Dispose();
+
+            TextGenerator generator = new TextGenerator();
+            generator.AppendLine("---");
+            generator.AppendLine("_disableContribution: true");
+            generator.AppendLine("---");
+            generator.AppendLine("# Code Inspection Report");
+            generator.AppendLine();
+            generator.Append(File.ReadAllText(tempPath));
+            File.WriteAllText(GetPath(), generator.ToString());
+            File.Delete(tempPath);
             Output.LogLine("Built code inspection markdown.");
         }
         else
@@ -76,20 +87,18 @@ public class CodeInspection : StepBase
         generator.AppendLine("<xsl:key name=\"ISSUETYPES\" match=\"/Report/Issues/Project/Issue\" use=\"@TypeId\"/>");
         generator.AppendLine("<xsl:output method=\"html\" indent=\"yes\"/>");
         generator.AppendLine("<xsl:template match=\"/\" name=\"TopLevelReport\">");
-        generator.AppendLine("---");
-        generator.AppendLine("_disableContribution: true");
-        generator.AppendLine("---");
-        generator.AppendLine("# Code Inspection Report");
-        generator.AppendLine();
         generator.AppendLine("<xsl:for-each select=\"/Report/IssueTypes/IssueType\">");
-        generator.AppendLine("## <xsl:value-of select=\"@Severity\"/> - <xsl:value-of select=\"@Description\"/>");
-        generator.AppendLine();
+        generator.AppendLine("### <xsl:value-of select=\"@Severity\"/> - <xsl:value-of select=\"@Description\"/>");
         generator.AppendLine("File | Line Number | Message");
-        generator.AppendLine(":--- | :--- | ---");
+        generator.AppendLine(":--- | :--- | ----");
+        generator.PushIndent();
         generator.AppendLine("<xsl:for-each select=\"key('ISSUETYPES', @Id)\">");
+        generator.PushIndent();
         generator.AppendLine(
             "<xsl:value-of select=\"@File\"/> | <xsl:value-of select=\"@Line\"/> | <xsl:value-of select=\"@Message\"/>");
+        generator.PopIndent();
         generator.AppendLine("</xsl:for-each>");
+        generator.PopIndent();
         generator.AppendLine("</xsl:for-each>");
         generator.AppendLine("</xsl:template>");
         generator.AppendLine("</xsl:stylesheet>");
