@@ -70,9 +70,9 @@ public class CodeInspection : StepBase
             generator.AppendLine();
 
             string translated = File.ReadAllText(tempPath);
-
-            generator.Append(translated);
             translated = translated.Replace("Packages\\com.dotbunny.gdx\\", string.Empty);
+            generator.Append(translated);
+
 
             File.WriteAllText(GetPath(), generator.ToString());
 
@@ -112,7 +112,8 @@ public class CodeInspection : StepBase
         generator.PushIndent();
 
         generator.AppendLine();
-        generator.AppendLine("### <xsl:value-of select=\"@Severity\"/>: <xsl:value-of select=\"@Description\"/>\n\r");
+        generator.AppendLine("### <xsl:value-of select=\"@Severity\"/>: <xsl:value-of select=\"@Description\"/>");
+        generator.AppendLine();
         generator.AppendLine("File | Line Number | Message");
         generator.AppendLine(":--- | :--- | ----");
 
@@ -120,7 +121,7 @@ public class CodeInspection : StepBase
         generator.PushIndent();
 
         generator.AppendLine(
-            "<xsl:value-of select=\"@File\"/> | <xsl:value-of select=\"@Line\"/> | <xsl:value-of select=\"@Message\"/>\n\r");
+            "<xsl:value-of select=\"@File\"/> | <xsl:value-of select=\"@Line\"/> | <xsl:value-of select=\"@Message\"/>");
         generator.PopIndent();
 
         generator.AppendLine("</xsl:for-each>");
@@ -130,7 +131,7 @@ public class CodeInspection : StepBase
         generator.PopIndent();
 
         generator.AppendLine("</xsl:template>");
-        generator.PushIndent();
+        generator.PopIndent();
 
         generator.AppendLine("</xsl:stylesheet>");
 
