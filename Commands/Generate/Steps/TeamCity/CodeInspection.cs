@@ -2,6 +2,7 @@
 // dotBunny licenses this file to you under the BSL-1.0 license.
 // See the LICENSE file in the project root for more information.
 
+using System.Dynamic;
 using System.IO;
 using System.Runtime.InteropServices.ComTypes;
 using System.Xml;
@@ -81,16 +82,7 @@ public class CodeInspection : StepBase
 
             File.WriteAllText(GetPath(), generator.ToString());
 
-
-
-
             File.Copy(teamCityArtifact, Path.Combine(Program.InputDirectory, ".docfx", "reports", "inspection.xml"));
-
-            Output.LogLine("START MD");
-            Output.Log(generator.ToString());
-            Output.NextLine();
-            Output.LogLine("END MD");
-
             File.Delete(tempPath);
             Output.LogLine("Built code inspection markdown.");
         }
@@ -109,14 +101,15 @@ public class CodeInspection : StepBase
         generator.AppendLine("<xsl:output method=\"html\" indent=\"yes\"/>");
         generator.AppendLine("<xsl:template match=\"/\" name=\"TopLevelReport\">");
         generator.AppendLine("<xsl:for-each select=\"/Report/IssueTypes/IssueType\">");
+        generator.AppendLine("<xsl:sort select=\"@Severity\" order=\"descending\" />");
         generator.AppendLine();
         generator.AppendLine("### <xsl:value-of select=\"@Severity\"/>: <xsl:value-of select=\"@Description\"/>");
         generator.AppendLine();
-        generator.AppendLine("| File | Line Number | Message |");
-        generator.AppendLine("| :--- | :--- | ---- |");
+        generator.AppendLine("| File | Message |");
+        generator.AppendLine("| :--- | ---- |");
         generator.AppendLine("<xsl:for-each select=\"key('ISSUETYPES', @Id)\">");
         generator.AppendLine(
-            "| <xsl:value-of select=\"@File\"/> | <xsl:value-of select=\"@Line\"/> | <xsl:value-of select=\"@Message\"/> |");
+            "| <xsl:value-of select=\"@File\"/>:<xsl:value-of select=\"@Line\"/> | <xsl:value-of select=\"@Message\"/> |");
         generator.AppendLine("</xsl:for-each>");
         generator.AppendLine("</xsl:for-each>");
         generator.AppendLine("</xsl:template>");
