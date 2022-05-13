@@ -101,40 +101,22 @@ public class CodeInspection : StepBase
         TextGenerator generator = new TextGenerator();
         generator.AppendLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
         generator.AppendLine("<xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" xmlns:msxsl=\"urn:schemas-microsoft-com:xslt\" exclude-result-prefixes=\"msxsl\">");
-        generator.PushIndent();
-
         generator.AppendLine("<xsl:key name=\"ISSUETYPES\" match=\"/Report/Issues/Project/Issue\" use=\"@TypeId\"/>");
         generator.AppendLine("<xsl:output method=\"html\" indent=\"yes\"/>");
         generator.AppendLine("<xsl:template match=\"/\" name=\"TopLevelReport\">");
-        generator.PushIndent();
-
         generator.AppendLine("<xsl:for-each select=\"/Report/IssueTypes/IssueType\">");
-        generator.PushIndent();
-
         generator.AppendLine();
         generator.AppendLine("### <xsl:value-of select=\"@Severity\"/>: <xsl:value-of select=\"@Description\"/>");
         generator.AppendLine();
         generator.AppendLine("| File | Line Number | Message |");
         generator.AppendLine("| :--- | :--- | ---- |");
-
         generator.AppendLine("<xsl:for-each select=\"key('ISSUETYPES', @Id)\">");
-        generator.PushIndent();
-
         generator.AppendLine(
             "| <xsl:value-of select=\"@File\"/> | <xsl:value-of select=\"@Line\"/> | <xsl:value-of select=\"@Message\"/> | ");
-        generator.PopIndent();
-
         generator.AppendLine("</xsl:for-each>");
-        generator.PopIndent();
-
         generator.AppendLine("</xsl:for-each>");
-        generator.PopIndent();
-
         generator.AppendLine("</xsl:template>");
-        generator.PopIndent();
-
         generator.AppendLine("</xsl:stylesheet>");
-
         return generator.ToString();
     }
 }
