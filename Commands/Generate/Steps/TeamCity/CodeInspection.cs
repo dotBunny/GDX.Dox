@@ -68,6 +68,9 @@ public class CodeInspection : StepBase
             generator.AppendLine("---");
             generator.AppendLine("# Code Inspection Report");
             generator.AppendLine();
+            generator.AppendLine("[XML](/reports/inspection.xml)");
+            generator.AppendLine();
+            generator.AppendLine();
 
             string translated = File.ReadAllText(tempPath);
             translated = translated.Replace("Packages\\com.dotbunny.gdx\\", string.Empty);
@@ -76,6 +79,7 @@ public class CodeInspection : StepBase
 
             File.WriteAllText(GetPath(), generator.ToString());
 
+            File.Copy(teamCityArtifact, Path.Combine(Program.InputDirectory, ".docfx", "reports", "inspection.xml"));
 
             Output.LogLine("START XLST");
             Output.Log(GetTransformation());
