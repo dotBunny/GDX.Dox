@@ -74,6 +74,7 @@ public class CodeInspection : StepBase
 
             string translated = File.ReadAllText(tempPath);
             translated = translated.Replace("Packages\\com.dotbunny.gdx\\", string.Empty);
+            translated = translated.Replace("|\r\n\r\n|", "|\r\n|");
             translated = translated.Replace("|\n\n|", "|\n|");
             generator.Append(translated);
 
