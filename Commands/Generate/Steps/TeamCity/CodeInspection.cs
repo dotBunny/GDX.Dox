@@ -74,17 +74,16 @@ public class CodeInspection : StepBase
 
             string translated = File.ReadAllText(tempPath);
             translated = translated.Replace("Packages\\com.dotbunny.gdx\\", string.Empty);
+            translated = translated.Replace("|\n\n|", "|\n|");
             generator.Append(translated);
 
 
             File.WriteAllText(GetPath(), generator.ToString());
 
-            File.Copy(teamCityArtifact, Path.Combine(Program.InputDirectory, ".docfx", "reports", "inspection.xml"));
 
-            Output.LogLine("START XLST");
-            Output.Log(GetTransformation());
-            Output.NextLine();
-            Output.LogLine("END XLST");
+
+
+            File.Copy(teamCityArtifact, Path.Combine(Program.InputDirectory, ".docfx", "reports", "inspection.xml"));
 
             Output.LogLine("START MD");
             Output.Log(generator.ToString());
