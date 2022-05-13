@@ -114,14 +114,14 @@ public class CodeInspection : StepBase
         generator.AppendLine();
         generator.AppendLine("### <xsl:value-of select=\"@Severity\"/>: <xsl:value-of select=\"@Description\"/>");
         generator.AppendLine();
-        generator.AppendLine("File | Line Number | Message");
-        generator.AppendLine(":--- | :--- | ----");
+        generator.AppendLine("| File | Line Number | Message |");
+        generator.AppendLine("| :--- | :--- | ---- |");
 
         generator.AppendLine("<xsl:for-each select=\"key('ISSUETYPES', @Id)\">");
         generator.PushIndent();
 
         generator.AppendLine(
-            "<xsl:value-of select=\"@File\"/> | <xsl:value-of select=\"@Line\"/> | <xsl:value-of select=\"@Message\"/>");
+            "| <xsl:value-of select=\"@File\"/> | <xsl:value-of select=\"@Line\"/> | <xsl:value-of select=\"@Message\"/> | ");
         generator.PopIndent();
 
         generator.AppendLine("</xsl:for-each>");
