@@ -178,7 +178,7 @@ public class CodeInspection : StepBase
         generator.AppendLine($"<xsl:if test=\"count($allItems{severity}) &gt; 0\">");
 
         // Build table
-        generator.AppendLine($"## {sectionTitle} (<xsl:value-of select=\"count($allItems{severity})\" />)");
+        generator.AppendLine($"## {sectionTitle}");
         generator.AppendLine($"<xsl:for-each select=\"$allItems{severity}\">");
         generator.AppendLine();
         generator.AppendLine("### <xsl:value-of select=\"@Description\"/>");
