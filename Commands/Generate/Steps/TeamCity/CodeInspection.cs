@@ -142,7 +142,7 @@ public class CodeInspection : StepBase
                 {
                     currentIndex = foundIndex + startLength;
                 }
-
+                totalLength = translated.Length;
             }
         }
 
@@ -185,6 +185,7 @@ public class CodeInspection : StepBase
                 }
 
             }
+            totalLength = translated.Length;
         }
 
         Output.LogLine($"Found {count.ToString()} blocks.");
