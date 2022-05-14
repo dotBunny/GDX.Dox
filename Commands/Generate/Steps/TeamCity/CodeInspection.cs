@@ -128,7 +128,7 @@ public class CodeInspection : StepBase
                 foundIndex = translated.IndexOf(k_DescriptionStartTag, currentIndex, StringComparison.Ordinal);
                 if (foundIndex != -1)
                 {
-                    int endIndex = translated.IndexOf(k_DescriptionEndTag, foundIndex + startLength, StringComparison.Ordinal);
+                    int endIndex = translated.IndexOf(k_DescriptionEndTag, foundIndex + endLength, StringComparison.Ordinal);
                     if (endIndex != -1)
                     {
                         string foundDescription = translated.Substring(foundIndex + startLength,
