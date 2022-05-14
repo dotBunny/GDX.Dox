@@ -113,9 +113,10 @@ public class CodeInspection : StepBase
         int foundIndex = 0;
         int startLength = k_LinkStartTag.Length;
         int endLength = k_LinkEndTag.Length;
+        int totalLength = translated.Length;
         Output.LogLine($"Looking for {k_LinkStartTag} ({startLength.ToString()}) /  {k_LinkEndTag} ({endLength.ToString()})");
         int count = 0;
-        while (foundIndex != -1)
+        while (foundIndex != -1 && currentIndex <= totalLength)
         {
             foundIndex = translated.IndexOf(k_LinkStartTag, currentIndex, StringComparison.Ordinal);
             if (foundIndex != -1)
@@ -150,20 +151,18 @@ public class CodeInspection : StepBase
         Output.LogLine("Building type blocks ...");
         int currentIndex = 0;
         int foundIndex = 0;
+        int totalLength = translated.Length;
         int startLength = k_DescriptionStartTag.Length;
         int endLength = k_DescriptionEndTag.Length;
 
         Output.LogLine($"Looking for {k_DescriptionStartTag} ({startLength.ToString()}) /  {k_DescriptionEndTag} ({endLength.ToString()})");
         int count = 0;
-        while (foundIndex != -1)
+        while (foundIndex != -1 && currentIndex <= totalLength)
         {
-            Output.LogLine($"START AT: {currentIndex}");
             foundIndex = translated.IndexOf(k_DescriptionStartTag, currentIndex, StringComparison.Ordinal);
-            Output.LogLine($"FOUND AT: {foundIndex}");
             if (foundIndex != -1)
             {
                 int endIndex = translated.IndexOf(k_DescriptionEndTag, foundIndex + startLength, StringComparison.Ordinal);
-                Output.LogLine($"END AT: {foundIndex}");
                 if (endIndex != -1)
                 {
                     count++;
