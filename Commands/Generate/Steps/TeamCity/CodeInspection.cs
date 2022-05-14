@@ -104,7 +104,7 @@ public class CodeInspection : StepBase
 
         // Warnings
         generator.AppendLine("## Warnings");
-        generator.AppendLine("<xsl:for-each select=\"/Report/IssueTypes/IssueType[@Severity=WARNING]\">");
+        generator.AppendLine("<xsl:for-each select=\"/Report/IssueTypes/IssueType[@Severity='WARNING']\">");
         generator.AppendLine();
         generator.AppendLine("### <xsl:value-of select=\"@Description\"/>");
         generator.AppendLine();
@@ -118,7 +118,7 @@ public class CodeInspection : StepBase
 
         // Suggestions
         generator.AppendLine("## Suggestions");
-        generator.AppendLine("<xsl:for-each select=\"/Report/IssueTypes/IssueType[@Severity=SUGGESTION]\">");
+        generator.AppendLine("<xsl:for-each select=\"/Report/IssueTypes/IssueType[@Severity='SUGGESTION']\">");
         generator.AppendLine();
         generator.AppendLine("### <xsl:value-of select=\"@Description\"/>");
         generator.AppendLine();
