@@ -70,10 +70,15 @@ public class CodeInspection : StepBase
             generator.AppendLine("---");
             generator.AppendLine("_disableContribution: true");
             generator.AppendLine("---");
+
             generator.AppendLine("# Code Inspection Report");
             generator.AppendLine();
+
             generator.AppendLine("[XML](/reports/inspection.xml)");
             generator.AppendLine();
+
+            generator.AppendLine("> [!NOTE]");
+            generator.AppendLine("> A significant portion of the suggestions found by code inspection are based on the exposure of fields that could be marked private or internal. As additional unit tests get implemented, this should start to go down.");
             generator.AppendLine();
 
             string translated = File.ReadAllText(tempPath);
