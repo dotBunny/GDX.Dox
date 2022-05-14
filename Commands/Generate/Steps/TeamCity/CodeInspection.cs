@@ -3,9 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
-using System.Dynamic;
 using System.IO;
-using System.Runtime.InteropServices.ComTypes;
 using System.Xml;
 using System.Xml.Xsl;
 using Dox.Utils;
@@ -159,10 +157,13 @@ public class CodeInspection : StepBase
         int count = 0;
         while (foundIndex != -1)
         {
+            Output.LogLine($"START AT: {currentIndex}");
             foundIndex = translated.IndexOf(k_DescriptionStartTag, currentIndex, StringComparison.Ordinal);
+            Output.LogLine($"FOUND AT: {foundIndex}");
             if (foundIndex != -1)
             {
-                int endIndex = translated.IndexOf(k_DescriptionEndTag, foundIndex + endLength, StringComparison.Ordinal);
+                int endIndex = translated.IndexOf(k_DescriptionEndTag, foundIndex + startLength, StringComparison.Ordinal);
+                Output.LogLine($"END AT: {foundIndex}");
                 if (endIndex != -1)
                 {
                     count++;
