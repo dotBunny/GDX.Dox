@@ -30,6 +30,11 @@ public class Portability : StepBase
         {
             File.Delete(GetDgmlPath());
         }
+
+        if (File.Exists(GetHtmlPath()))
+        {
+            File.Delete(GetHtmlPath());
+        }
     }
 
     /// <inheritdoc />
@@ -53,7 +58,10 @@ public class Portability : StepBase
     {
         return Path.Combine(Program.InputDirectory, ".docfx", "reports", "portability.dgml");
     }
-
+    string GetHtmlPath()
+    {
+        return Path.Combine(Program.InputDirectory, ".docfx", "reports", "portability-raw.html");
+    }
 
     /// <inheritdoc />
     public override void Execute()
@@ -78,12 +86,12 @@ public class Portability : StepBase
             return;
         }
 
-        string tempFile = $"{Path.GetTempFileName()}.html";
+        string htmlFile = GetHtmlPath();
 
         bool htmlExecute = ChildProcess.WaitFor(
             Path.Combine(ApiPort.InstallPath, "ApiPort.exe"),
             ApiPort.InstallPath,
-            $"analyze -f {gdxLibraryPath} -f {gdxEditorLibraryPath} -o {tempFile} -r html");
+            $"analyze -f {gdxLibraryPath} -f {gdxEditorLibraryPath} -o {htmlFile} -r html");
         bool dgmlExecute = ChildProcess.WaitFor(
             Path.Combine(ApiPort.InstallPath, "ApiPort.exe"),
             ApiPort.InstallPath,
@@ -91,12 +99,11 @@ public class Portability : StepBase
 
 
         // Manipulate HTML to something that we can change
-        if (File.Exists(tempFile))
+        if (File.Exists(htmlFile))
         {
-            Output.LogLine($"Converting {tempFile} to Markdown.");
+            Output.LogLine($"Converting {htmlFile} to Markdown.");
             HtmlAgilityPack.HtmlDocument doc = new HtmlDocument();
-            doc.LoadHtml(File.ReadAllText(tempFile));
-            //File.WriteAllText(Path.Combine(Program.InputDirectory, "test.html"), File.ReadAllText(tempFile));
+            doc.LoadHtml(File.ReadAllText(htmlFile));
             TextGenerator generator = new TextGenerator();
             generator.AppendLine("---");
             generator.AppendLine("_disableContribution: true");
@@ -106,7 +113,7 @@ public class Portability : StepBase
             HtmlNode firstHeader = doc.DocumentNode.Descendants("h1").First();
             generator.AppendLine($"# {firstHeader.InnerHtml}");
             generator.AppendLine();
-            generator.AppendLine("[DGML](/reports/portability.dgml)");
+            generator.AppendLine("[DGML](/reports/portability.dgml) | [HTML](/reports/portability-raw.html)");
             generator.AppendLine();
 
             HtmlNodeCollection nodes = doc.DocumentNode.SelectNodes("//table[@id='Portability Summary']//tr"); //|th|td|a[@href]
@@ -142,7 +149,6 @@ public class Portability : StepBase
             }
 
             File.WriteAllText(GetMarkdownPath(), generator.ToString());
-            File.Delete(tempFile);
         }
 
         if (!htmlExecute || !dgmlExecute)
