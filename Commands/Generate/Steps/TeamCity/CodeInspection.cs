@@ -88,65 +88,10 @@ public class CodeInspection : StepBase
             translated = translated.Replace("|\n\n|", "|\n|");
 
             // Make links
-            Output.LogLine("Creating hyperlinks ...");
-            int currentIndex = 0;
-            int foundIndex = 0;
-            int startLength = k_LinkStartTag.Length;
-            int endLength = k_LinkEndTag.Length;
-            while (foundIndex != -1)
-            {
-                foundIndex = translated.IndexOf(k_LinkStartTag, currentIndex, StringComparison.Ordinal);
-                if (foundIndex != -1)
-                {
-                    int endIndex = translated.IndexOf(k_LinkEndTag, foundIndex + startLength, StringComparison.Ordinal);
-                    if (endIndex != -1)
-                    {
-                        string foundLink = translated.Substring(foundIndex + startLength,
-                            endIndex - (foundIndex + startLength));
-                        string[] splitLink = foundLink.Split(':');
-
-                        translated = translated.Replace($"{k_LinkStartTag}{foundLink}{k_LinkEndTag}",
-                            $"[{Path.GetFileName(splitLink[0])}:{splitLink[1]}](https://github.com/dotBunny/GDX/blob/main/{splitLink[0].Replace("\\", "/")}#L{splitLink[1]} \"{foundLink}\")");
-                        currentIndex = endIndex + endLength;
-                    }
-                    else
-                    {
-                        currentIndex = foundIndex + startLength;
-                    }
-
-                }
-            }
+            translated = CreateLinks(translated);
 
             // Catch keywords
-            Output.LogLine("Building type blocks ...");
-            currentIndex = 0;
-            foundIndex = 0;
-            startLength = k_DescriptionStartTag.Length;
-            endLength = k_DescriptionEndTag.Length;
-            while (foundIndex != -1)
-            {
-                foundIndex = translated.IndexOf(k_DescriptionStartTag, currentIndex, StringComparison.Ordinal);
-                if (foundIndex != -1)
-                {
-                    int endIndex = translated.IndexOf(k_DescriptionEndTag, foundIndex + endLength, StringComparison.Ordinal);
-                    if (endIndex != -1)
-                    {
-                        string foundDescription = translated.Substring(foundIndex + startLength,
-                            endIndex - (foundIndex + startLength));
-
-                        translated = translated.Replace($"{k_DescriptionStartTag}{foundDescription}{k_DescriptionEndTag}",
-                            foundDescription.Replace("'", "`"));
-
-                        currentIndex = endIndex + endLength;
-                    }
-                    else
-                    {
-                        currentIndex = foundIndex + startLength;
-                    }
-
-                }
-            }
-
+            translated = CreateBlocks(translated);
 
             generator.Append(translated);
 
@@ -161,6 +106,74 @@ public class CodeInspection : StepBase
         {
             Output.Error($"Unable to find code inspection artifacts at {teamCityArtifact}.", -1, true);
         }
+    }
+
+    string CreateLinks(string translated)
+    {
+        Output.LogLine("Creating hyperlinks ...");
+        int currentIndex = 0;
+        int foundIndex = 0;
+        int startLength = k_LinkStartTag.Length;
+        int endLength = k_LinkEndTag.Length;
+        while (foundIndex != -1)
+        {
+            foundIndex = translated.IndexOf(k_LinkStartTag, currentIndex, StringComparison.Ordinal);
+            if (foundIndex != -1)
+            {
+                int endIndex = translated.IndexOf(k_LinkEndTag, foundIndex + startLength, StringComparison.Ordinal);
+                if (endIndex != -1)
+                {
+                    string foundLink = translated.Substring(foundIndex + startLength,
+                        endIndex - (foundIndex + startLength));
+                    string[] splitLink = foundLink.Split(':');
+
+                    translated = translated.Replace($"{k_LinkStartTag}{foundLink}{k_LinkEndTag}",
+                        $"[{Path.GetFileName(splitLink[0])}:{splitLink[1]}](https://github.com/dotBunny/GDX/blob/main/{splitLink[0].Replace("\\", "/")}#L{splitLink[1]} \"{foundLink}\")");
+                    currentIndex = endIndex + endLength;
+                }
+                else
+                {
+                    currentIndex = foundIndex + startLength;
+                }
+
+            }
+        }
+
+        return translated;
+    }
+    string CreateBlocks(string translated)
+    {
+        // Catch keywords
+        Output.LogLine("Building type blocks ...");
+        int currentIndex = 0;
+        int foundIndex = 0;
+        int startLength = k_DescriptionStartTag.Length;
+        int endLength = k_DescriptionEndTag.Length;
+        while (foundIndex != -1)
+        {
+            foundIndex = translated.IndexOf(k_DescriptionStartTag, currentIndex, StringComparison.Ordinal);
+            if (foundIndex != -1)
+            {
+                int endIndex = translated.IndexOf(k_DescriptionEndTag, foundIndex + endLength, StringComparison.Ordinal);
+                if (endIndex != -1)
+                {
+                    string foundDescription = translated.Substring(foundIndex + startLength,
+                        endIndex - (foundIndex + startLength));
+
+                    translated = translated.Replace($"{k_DescriptionStartTag}{foundDescription}{k_DescriptionEndTag}",
+                        foundDescription.Replace("'", "`"));
+
+                    currentIndex = endIndex + endLength;
+                }
+                else
+                {
+                    currentIndex = foundIndex + startLength;
+                }
+
+            }
+        }
+
+        return translated;
     }
 
     string GetTransformation()
