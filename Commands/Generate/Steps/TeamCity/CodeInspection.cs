@@ -148,13 +148,15 @@ public class CodeInspection : StepBase
 
     void GenerateTable(TextGenerator generator, string sectionTitle, string severity)
     {
-        generator.AppendLine($"<xsl:variable name=\"allItems{severity}\"  select=\"/Report/IssueTypes/IssueType[@Severity='{{severity}}']\" />");
+        // Define the data were working on
+        generator.AppendLine($"<xsl:variable name=\"allItems{severity}\"  select=\"/Report/IssueTypes/IssueType[@Severity='{severity}']\" />");
+
+        // Do we actually have any?
         generator.AppendLine($"<xsl:if test=\"count($allItems{severity}) &gt; 0\">");
 
-        generator.AppendLine($"<xsl:variable name=\"itemCount{severity}\" select=\"count($allItems{severity})\" />");
-
-        generator.AppendLine($"## {sectionTitle} (<xsl:value-of select=\"$itemCount{severity}\" />)");
-        generator.AppendLine($"<xsl:for-each select=\"/Report/IssueTypes/IssueType[@Severity='{severity}']\">");
+        // Build table
+        generator.AppendLine($"## {sectionTitle} (<xsl:value-of select=\"count($allItems{severity})\" />)");
+        generator.AppendLine($"<xsl:for-each select=\"$allItems{severity}\">");
         generator.AppendLine();
         generator.AppendLine("### <xsl:value-of select=\"@Description\"/>");
         generator.AppendLine();
