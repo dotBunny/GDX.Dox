@@ -148,7 +148,11 @@ public class CodeInspection : StepBase
 
     void GenerateTable(TextGenerator generator, string sectionTitle, string severity)
     {
-        generator.AppendLine($"## {sectionTitle}");
+        generator.AppendLine("<xsl:variable name=\"allItems\"  select=\"/Report/IssueTypes/IssueType[@Severity='{severity}']\" />");
+        generator.AppendLine("<xsl:variable name=\"itemCount\" select=\"count($allItems)\" />");
+        generator.AppendLine("<xsl:if test=\"$itemCount &gt; 0\">");
+
+        generator.AppendLine($"## {sectionTitle} (<xsl:value-of select=\"$itemCount\" />)");
         generator.AppendLine($"<xsl:for-each select=\"/Report/IssueTypes/IssueType[@Severity='{severity}']\">");
         generator.AppendLine();
         generator.AppendLine("### <xsl:value-of select=\"@Description\"/>");
@@ -160,5 +164,7 @@ public class CodeInspection : StepBase
             $"| {k_LinkStartTag}<xsl:value-of select=\"@File\"/>:<xsl:value-of select=\"@Line\"/>{k_LinkEndTag} | <xsl:value-of select=\"@Message\"/> |");
         generator.AppendLine("</xsl:for-each>");
         generator.AppendLine("</xsl:for-each>");
+
+        generator.AppendLine("</xsl:if>");
     }
 }
