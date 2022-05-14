@@ -88,6 +88,7 @@ public class CodeInspection : StepBase
             translated = translated.Replace("|\n\n|", "|\n|");
 
             // Make links
+            Output.LogLine("Creating hyperlinks ...");
             int currentIndex = 0;
             int foundIndex = 0;
             int startLength = k_LinkStartTag.Length;
@@ -117,6 +118,7 @@ public class CodeInspection : StepBase
             }
 
             // Catch keywords
+            Output.LogLine("Building type blocks ...");
             currentIndex = 0;
             foundIndex = 0;
             startLength = k_DescriptionStartTag.Length;
