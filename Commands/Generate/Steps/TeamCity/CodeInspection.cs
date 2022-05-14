@@ -149,8 +149,9 @@ public class CodeInspection : StepBase
     void GenerateTable(TextGenerator generator, string sectionTitle, string severity)
     {
         generator.AppendLine($"<xsl:variable name=\"allItems{severity}\"  select=\"/Report/IssueTypes/IssueType[@Severity='{{severity}}']\" />");
+        generator.AppendLine($"<xsl:if test=\"count($allItems{severity}) &gt; 0\">");
+
         generator.AppendLine($"<xsl:variable name=\"itemCount{severity}\" select=\"count($allItems{severity})\" />");
-        generator.AppendLine($"<xsl:if test=\"$itemCount{severity} &gt; 0\">");
 
         generator.AppendLine($"## {sectionTitle} (<xsl:value-of select=\"$itemCount{severity}\" />)");
         generator.AppendLine($"<xsl:for-each select=\"/Report/IssueTypes/IssueType[@Severity='{severity}']\">");
