@@ -2,6 +2,7 @@
 // dotBunny licenses this file to you under the BSL-1.0 license.
 // See the LICENSE file in the project root for more information.
 
+using System;
 using System.Dynamic;
 using System.IO;
 using System.Runtime.InteropServices.ComTypes;
@@ -16,6 +17,8 @@ public class CodeInspection : StepBase
     //Staging\ResharperInspection.xml
     public const string Key = "code-inspection";
     public const string Title = "Code Inspection";
+    const string k_LinkStartTag = "___STARTLINK___";
+    const string k_LinkEndTag = "___ENDLINK___";
 
     static string GetPath()
     {
@@ -74,9 +77,41 @@ public class CodeInspection : StepBase
             generator.AppendLine();
 
             string translated = File.ReadAllText(tempPath);
+
+            // Long paths
             translated = translated.Replace("Packages\\com.dotbunny.gdx\\", string.Empty);
+
+            // Line Endings
             translated = translated.Replace("|\r\n\r\n|", "|\r\n|");
             translated = translated.Replace("|\n\n|", "|\n|");
+
+            // Make links
+            int currentIndex = 0;
+            int foundIndex = 0;
+
+            int startLength = k_LinkStartTag.Length;
+
+            int endLength = k_LinkEndTag.Length;
+            while (foundIndex != -1)
+            {
+                foundIndex = translated.IndexOf(k_LinkStartTag, currentIndex, StringComparison.Ordinal);
+                if (foundIndex != -1)
+                {
+                    int endIndex = translated.IndexOf(k_LinkEndTag, foundIndex + startLength, StringComparison.Ordinal);
+                    if (endIndex != -1)
+                    {
+                        string foundLink = translated.Substring(foundIndex + startLength,
+                            endIndex - (foundIndex + startLength));
+                        string[] splitLink = foundLink.Split(':');
+
+                        translated = translated.Replace($"{k_LinkStartTag}{foundLink}{k_LinkEndTag}",
+                            $"[{Path.GetFileName(splitLink[0])}:{splitLink[1]}](https://github.com/dotBunny/GDX/blob/main/{splitLink[0]}#L{splitLink[1]} \"{foundLink}\")");
+                    }
+                    currentIndex = endIndex + endLength;
+                }
+            }
+
+
             generator.Append(translated);
 
 
@@ -94,45 +129,36 @@ public class CodeInspection : StepBase
 
     string GetTransformation()
     {
-        //WARNING || SUGGESTION || HINT
-        TextGenerator generator = new TextGenerator();
+        TextGenerator generator = new();
         generator.AppendLine("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
         generator.AppendLine("<xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" xmlns:msxsl=\"urn:schemas-microsoft-com:xslt\" exclude-result-prefixes=\"msxsl\">");
         generator.AppendLine("<xsl:key name=\"ISSUETYPES\" match=\"/Report/Issues/Project/Issue\" use=\"@TypeId\"/>");
         generator.AppendLine("<xsl:output method=\"html\" indent=\"yes\"/>");
         generator.AppendLine("<xsl:template match=\"/\" name=\"TopLevelReport\">");
 
-        // Warnings
-        generator.AppendLine("## Warnings");
-        generator.AppendLine("<xsl:for-each select=\"/Report/IssueTypes/IssueType[@Severity='WARNING']\">");
-        generator.AppendLine();
-        generator.AppendLine("### <xsl:value-of select=\"@Description\"/>");
-        generator.AppendLine();
-        generator.AppendLine("| File | Message |");
-        generator.AppendLine("| :--- | ---- |");
-        generator.AppendLine("<xsl:for-each select=\"key('ISSUETYPES', @Id)\">");
-        generator.AppendLine(
-            "| <xsl:value-of select=\"@File\"/>:<xsl:value-of select=\"@Line\"/> | <xsl:value-of select=\"@Message\"/> |");
-        generator.AppendLine("</xsl:for-each>");
-        generator.AppendLine("</xsl:for-each>");
-
-        // Suggestions
-        generator.AppendLine("## Suggestions");
-        generator.AppendLine("<xsl:for-each select=\"/Report/IssueTypes/IssueType[@Severity='SUGGESTION']\">");
-        generator.AppendLine();
-        generator.AppendLine("### <xsl:value-of select=\"@Description\"/>");
-        generator.AppendLine();
-        generator.AppendLine("| File | Message |");
-        generator.AppendLine("| :--- | ---- |");
-        generator.AppendLine("<xsl:for-each select=\"key('ISSUETYPES', @Id)\">");
-        generator.AppendLine(
-            "| <xsl:value-of select=\"@File\"/>:<xsl:value-of select=\"@Line\"/> | <xsl:value-of select=\"@Message\"/> |");
-        generator.AppendLine("</xsl:for-each>");
-        generator.AppendLine("</xsl:for-each>");
-
+        GenerateTable(generator, "Errors", "ERROR");
+        GenerateTable(generator, "Warnings", "WARNING");
+        GenerateTable(generator, "Suggestions", "SUGGESTION");
+        GenerateTable(generator, "Hints", "HINT");
 
         generator.AppendLine("</xsl:template>");
         generator.AppendLine("</xsl:stylesheet>");
         return generator.ToString();
+    }
+
+    void GenerateTable(TextGenerator generator, string sectionTitle, string severity)
+    {
+        generator.AppendLine($"## {sectionTitle}");
+        generator.AppendLine($"<xsl:for-each select=\"/Report/IssueTypes/IssueType[@Severity='{severity}']\">");
+        generator.AppendLine();
+        generator.AppendLine("### <xsl:value-of select=\"@Description\"/>");
+        generator.AppendLine();
+        generator.AppendLine("| File | Message |");
+        generator.AppendLine("| :--- | ---- |");
+        generator.AppendLine("<xsl:for-each select=\"key('ISSUETYPES', @Id)\">");
+        generator.AppendLine(
+            $"| {k_LinkStartTag}<xsl:value-of select=\"@File\"/>:<xsl:value-of select=\"@Line\"/>{k_LinkEndTag} | <xsl:value-of select=\"@Message\"/> |");
+        generator.AppendLine("</xsl:for-each>");
+        generator.AppendLine("</xsl:for-each>");
     }
 }

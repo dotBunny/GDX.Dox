@@ -185,15 +185,24 @@ public static class Links
                 content = content.Replace("/gdx.dotbunny.com", "/localhost:8080");
                 // Special case cause our local hosting does not have SSL
                 content = content.Replace("https://localhost:8080", "http://localhost:8080");
+
+                // GitHub content links default to dev in this case
+                content = content.Replace("https://github.com/dotBunny/GDX/blob/main/",
+                    "https://github.com/dotBunny/GDX/blob/dev/");
                 return content;
             case Host.Main:
                 content = content.Replace("/gdx-dev.dotbunny.com", "/gdx.dotbunny.com");
                 content = content.Replace("/localhost:8080", "/gdx.dotbunny.com");
+                // GitHub content links default to dev in this case
+                content = content.Replace("https://github.com/dotBunny/GDX/blob/dev/",
+                    "https://github.com/dotBunny/GDX/blob/main/");
                 return content;
             case Host.Dev:
             default:
                 content = content.Replace("/gdx.dotbunny.com", "/gdx-dev.dotbunny.com");
                 content = content.Replace("/localhost:8080", "/gdx-dev.dotbunny.com");
+                content = content.Replace("https://github.com/dotBunny/GDX/blob/main/",
+                    "https://github.com/dotBunny/GDX/blob/dev/");
                 return content;
         }
     }
