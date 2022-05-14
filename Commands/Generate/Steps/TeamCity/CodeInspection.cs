@@ -19,6 +19,8 @@ public class CodeInspection : StepBase
     public const string Title = "Code Inspection";
     const string k_LinkStartTag = "___STARTLINK___";
     const string k_LinkEndTag = "___ENDLINK___";
+    const string k_DescriptionStartTag = "___STARTDESC___";
+    const string k_DescriptionEndTag = "___ENDDESC___";
 
     static string GetPath()
     {
@@ -88,9 +90,7 @@ public class CodeInspection : StepBase
             // Make links
             int currentIndex = 0;
             int foundIndex = 0;
-
             int startLength = k_LinkStartTag.Length;
-
             int endLength = k_LinkEndTag.Length;
             while (foundIndex != -1)
             {
@@ -106,6 +106,29 @@ public class CodeInspection : StepBase
 
                         translated = translated.Replace($"{k_LinkStartTag}{foundLink}{k_LinkEndTag}",
                             $"[{Path.GetFileName(splitLink[0])}:{splitLink[1]}](https://github.com/dotBunny/GDX/blob/main/{splitLink[0].Replace("\\", "/")}#L{splitLink[1]} \"{foundLink}\")");
+                    }
+                    currentIndex = endIndex + endLength;
+                }
+            }
+
+            // Catch keywords
+            currentIndex = 0;
+            foundIndex = 0;
+            startLength = k_DescriptionStartTag.Length;
+            endLength = k_DescriptionEndTag.Length;
+            while (foundIndex != -1)
+            {
+                foundIndex = translated.IndexOf(k_DescriptionStartTag, currentIndex, StringComparison.Ordinal);
+                if (foundIndex != -1)
+                {
+                    int endIndex = translated.IndexOf(k_DescriptionEndTag, foundIndex + startLength, StringComparison.Ordinal);
+                    if (endIndex != -1)
+                    {
+                        string foundDescription = translated.Substring(foundIndex + startLength,
+                            endIndex - (foundIndex + startLength));
+
+                        translated = translated.Replace($"{k_DescriptionStartTag}{foundDescription}{k_DescriptionEndTag}",
+                            foundDescription.Replace("'", "`"));
                     }
                     currentIndex = endIndex + endLength;
                 }
@@ -164,7 +187,7 @@ public class CodeInspection : StepBase
         generator.AppendLine("| :--- | ---- |");
         generator.AppendLine("<xsl:for-each select=\"key('ISSUETYPES', @Id)\">");
         generator.AppendLine(
-            $"| {k_LinkStartTag}<xsl:value-of select=\"@File\"/>:<xsl:value-of select=\"@Line\"/>{k_LinkEndTag} | <xsl:value-of select=\"@Message\"/> |");
+            $"| {k_LinkStartTag}<xsl:value-of select=\"@File\"/>:<xsl:value-of select=\"@Line\"/>{k_LinkEndTag} | {k_DescriptionStartTag}<xsl:value-of select=\"@Message\"/>{k_DescriptionEndTag} |");
         generator.AppendLine("</xsl:for-each>");
         generator.AppendLine("</xsl:for-each>");
 
