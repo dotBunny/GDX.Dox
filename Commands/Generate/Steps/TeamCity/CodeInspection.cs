@@ -105,7 +105,7 @@ public class CodeInspection : StepBase
                         string[] splitLink = foundLink.Split(':');
 
                         translated = translated.Replace($"{k_LinkStartTag}{foundLink}{k_LinkEndTag}",
-                            $"[{Path.GetFileName(splitLink[0])}:{splitLink[1]}](https://github.com/dotBunny/GDX/blob/main/{splitLink[0]}#L{splitLink[1]} \"{foundLink}\")");
+                            $"[{Path.GetFileName(splitLink[0])}:{splitLink[1]}](https://github.com/dotBunny/GDX/blob/main/{splitLink[0].Replace("\\", "/")}#L{splitLink[1]} \"{foundLink}\")");
                     }
                     currentIndex = endIndex + endLength;
                 }
