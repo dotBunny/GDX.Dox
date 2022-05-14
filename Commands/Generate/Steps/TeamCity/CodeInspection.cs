@@ -17,10 +17,10 @@ public class CodeInspection : StepBase
     //Staging\ResharperInspection.xml
     public const string Key = "code-inspection";
     public const string Title = "Code Inspection";
-    const string k_LinkStartTag = "___STARTLINK___";
-    const string k_LinkEndTag = "___ENDLINK___";
-    const string k_DescriptionStartTag = "___STARTDESC___";
-    const string k_DescriptionEndTag = "___ENDDESC___";
+    const string k_DescriptionStartTag = "___SDESC___";
+    const string k_DescriptionEndTag = "___EDESC___";
+    const string k_LinkStartTag = "___SLINK___";
+    const string k_LinkEndTag = "___ELINK___";
 
     static string GetPath()
     {
@@ -115,6 +115,8 @@ public class CodeInspection : StepBase
         int foundIndex = 0;
         int startLength = k_LinkStartTag.Length;
         int endLength = k_LinkEndTag.Length;
+        Output.LogLine($"Looking for {k_LinkStartTag} ({startLength.ToString()}) /  {k_LinkEndTag} ({endLength.ToString()})");
+        int count = 0;
         while (foundIndex != -1)
         {
             foundIndex = translated.IndexOf(k_LinkStartTag, currentIndex, StringComparison.Ordinal);
@@ -130,6 +132,7 @@ public class CodeInspection : StepBase
                     translated = translated.Replace($"{k_LinkStartTag}{foundLink}{k_LinkEndTag}",
                         $"[{Path.GetFileName(splitLink[0])}:{splitLink[1]}](https://github.com/dotBunny/GDX/blob/main/{splitLink[0].Replace("\\", "/")}#L{splitLink[1]} \"{foundLink}\")");
                     currentIndex = endIndex + endLength;
+                    count++;
                 }
                 else
                 {
@@ -138,6 +141,8 @@ public class CodeInspection : StepBase
 
             }
         }
+
+        Output.LogLine($"Found {count.ToString()} blocks.");
 
         return translated;
     }
@@ -149,6 +154,9 @@ public class CodeInspection : StepBase
         int foundIndex = 0;
         int startLength = k_DescriptionStartTag.Length;
         int endLength = k_DescriptionEndTag.Length;
+
+        Output.LogLine($"Looking for {k_DescriptionStartTag} ({startLength.ToString()}) /  {k_DescriptionEndTag} ({endLength.ToString()})");
+        int count = 0;
         while (foundIndex != -1)
         {
             foundIndex = translated.IndexOf(k_DescriptionStartTag, currentIndex, StringComparison.Ordinal);
@@ -157,6 +165,7 @@ public class CodeInspection : StepBase
                 int endIndex = translated.IndexOf(k_DescriptionEndTag, foundIndex + endLength, StringComparison.Ordinal);
                 if (endIndex != -1)
                 {
+                    count++;
                     string foundDescription = translated.Substring(foundIndex + startLength,
                         endIndex - (foundIndex + startLength));
 
@@ -172,6 +181,8 @@ public class CodeInspection : StepBase
 
             }
         }
+
+        Output.LogLine($"Found {count.ToString()} blocks.");
 
         return translated;
     }
