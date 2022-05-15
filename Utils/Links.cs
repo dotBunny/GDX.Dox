@@ -74,6 +74,15 @@ public static class Links
                         link = link.StartsWith("/") ? $"{linkBase}{link.Substring(1)}" : $"{linkBase}{relativePath}{link}";
                     }
 
+                    // We need to not care about automation links :|
+                    if (link.EndsWith("automation.md/")) continue;
+                    // // Check for contrib links
+                    // if (link.Contains("github.com") && link.EndsWith(".md/"))
+                    // {
+                    //     Output.LogLine($"Skipping contribute link: {link}.");
+                    //     continue;
+                    // }
+
                     if (checkedLinks.Contains(link)) continue;
 
                     Task<HttpStatusCode> delay = Commands.Generate.Steps.Host.Get(link, 2);
@@ -185,7 +194,6 @@ public static class Links
                 content = content.Replace("/gdx.dotbunny.com", "/localhost:8080");
                 // Special case cause our local hosting does not have SSL
                 content = content.Replace("https://localhost:8080", "http://localhost:8080");
-
                 // GitHub content links default to dev in this case
                 content = content.Replace("https://github.com/dotBunny/GDX/blob/main/",
                     "https://github.com/dotBunny/GDX/blob/dev/");
