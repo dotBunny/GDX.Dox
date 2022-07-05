@@ -38,6 +38,7 @@ public static class DeployCommand
         {
             "main" => Branch.Main,
             "dev" => Branch.Dev,
+            "<default>" => Branch.Dev,
             _ => TargetBranch
         };
         if (TargetBranch == Branch.Unknown)
