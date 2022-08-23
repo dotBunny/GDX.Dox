@@ -29,8 +29,8 @@ public static class Config
 
     public static readonly string[] AllSteps =
     {
-        DocFx.Key, ApiPort.Key, Clean.Key, Changelog.Key, SecurityPolicy.Key, CodeOfConduct.Key, License.Key,
-        Footer.Key, ProjectFiles.Key, XmlDocs.Key, Portability.Key, CodeInspection.Key,
+        DocFx.Key, Clean.Key, Changelog.Key, SecurityPolicy.Key, CodeOfConduct.Key, License.Key,
+        Footer.Key, ProjectFiles.Key, XmlDocs.Key, CodeInspection.Key,
         CodeCoverage.Key, Metadata.Key, TableOfContents.Key , Build.Key, Host.Key
     };
 
