@@ -12,7 +12,7 @@ namespace Dox.Commands.Generate.Steps.Unpack;
 public class DocFx : StepBase
 {
     public const string Key = "unpack-docfx";
-    const string k_PackageName = "docfx-2.59.2.zip";
+    const string k_PackageName = "docfx-2.59.4.zip";
     const string k_InstallPathKey = "docfx-path";
     public static string InstallPath;
 
