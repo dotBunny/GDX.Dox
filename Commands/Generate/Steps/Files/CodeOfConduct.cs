@@ -14,7 +14,7 @@ public class CodeOfConduct : StepBase
 
     static string GetPath()
     {
-        return Path.Combine(Program.InputDirectory, ".docfx", "manual", "contributing", "code-of-conduct.md");
+        return Path.Combine(Program.InputDirectory, ".docfx", "manual", "policy", "code-of-conduct.md");
     }
 
     public override void Clean()
