@@ -14,7 +14,7 @@ public class SecurityPolicy : StepBase
 
     static string GetPath()
     {
-        return Path.Combine(Program.InputDirectory, ".docfx", "manual", "security.md");
+        return Path.Combine(Program.InputDirectory, ".docfx", "manual", "policy", "security.md");
     }
 
     public override void Clean()
